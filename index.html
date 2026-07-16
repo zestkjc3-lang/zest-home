@@ -33,10 +33,10 @@
   .btn-ghost:hover{border-color:var(--ink);background:var(--cream)}
   .btn-sm{padding:10px 20px;font-size:14.5px}
 
-  .brand{display:inline-flex;align-items:center;gap:9px;font-weight:900;font-size:20px;color:var(--ink);letter-spacing:-.03em}
+  .brand{display:inline-flex;align-items:center;gap:9px;font-weight:900;font-size:20px;color:var(--ink);letter-spacing:-.03em;white-space:nowrap;flex:none;min-width:0}
   .brand .mark{width:26px;height:30px;flex:none}
-  .brand small{font-weight:800;font-size:10px;color:var(--gold);letter-spacing:.22em;margin-left:1px}
-  .brand img.logo{height:34px;width:auto}
+  .brand .name{display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap}
+  .brand small{font-weight:800;font-size:10px;color:var(--gold);letter-spacing:.18em}
 
   header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
   .nav{display:flex;align-items:center;gap:34px;height:70px}
@@ -223,6 +223,10 @@
   @media(max-width:900px){
     nav.menu,.nav .tel{display:none}
     .burger{display:block}
+    .nav{gap:12px}
+    .brand{font-size:17px;gap:7px}
+    .brand .mark{width:22px;height:26px}
+    .brand small{display:none}
     .feat-grid{grid-template-columns:repeat(2,1fr)}
     .prog-grid,.blog-grid,.foot-grid{grid-template-columns:1fr}
     .tiles .wrap{justify-content:flex-start}
@@ -254,10 +258,8 @@
 <header>
   <div class="wrap nav">
     <a href="#top" class="brand">
-      <img class="logo" src="images/logo.png" alt="제스트에듀" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'" />
-      <span style="display:none;align-items:center;gap:9px">
-        <svg class="mark" viewBox="0 0 40 44"><use href="#emblem"/></svg>제스트에듀<small>ZESTEDU</small>
-      </span>
+      <svg class="mark" viewBox="0 0 40 44" aria-hidden="true"><use href="#emblem"/></svg>
+      <span class="name">제스트에듀<small>ZESTEDU</small></span>
     </a>
     <nav class="menu">
       <a href="#about">학원소개</a>
@@ -457,7 +459,7 @@
   <div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand">
-        <a href="#top" class="brand"><svg class="mark" viewBox="0 0 40 44"><use href="#emblem"/></svg>제스트에듀<small>ZESTEDU</small></a>
+        <a href="#top" class="brand"><svg class="mark" viewBox="0 0 40 44" aria-hidden="true"><use href="#emblem"/></svg><span class="name">제스트에듀<small>ZESTEDU</small></span></a>
         <p>중·고등 영어 전문학원 제스트에듀. 학년별 반편성 · 수준별 지도 · 철저한 학습관리 · 맞춤형 커리큘럼으로 최상위권의 클래스를 만듭니다.</p>
       </div>
       <div>
