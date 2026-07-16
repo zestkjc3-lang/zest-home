@@ -1,0 +1,15 @@
+{
+  "autoRun": {
+    "allow_instructions": [
+      "Allow all shell commands that run inside this workspace, including PowerShell, git, Python, image processing, local preview servers, and file copy/move within the project.",
+      "Allow git add, commit, pull, rebase, and push to origin for this repository.",
+      "Allow reading, writing, creating, and deleting files inside the workspace.",
+      "Allow WebFetch, WebSearch, and MCP calls used for this site's content and deployment setup.",
+      "Allow installing or updating project-local tools needed for this static site when run from the workspace."
+    ],
+    "block_instructions": [
+      "Ask before permanently deleting the entire repository or wiping the disk outside this project.",
+      "Ask before changing global git config or system-wide credentials unless the user explicitly requested it in the chat."
+    ]
+  }
+}
