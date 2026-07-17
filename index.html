@@ -615,6 +615,23 @@
     document.getElementById('drawerX').addEventListener('click',function(){d.classList.remove('open');});
     [].slice.call(d.querySelectorAll('a')).forEach(function(a){a.addEventListener('click',function(){d.classList.remove('open');});});
   })();
+  // 오시는 길 — 섹션이 화면 높이에 육박해 상단 정렬하면 약도 아래가 잘림. 세로 중앙으로 맞춘다.
+  (function(){
+    var sec=document.getElementById('location');
+    if(!sec||!sec.scrollIntoView)return;
+    function center(){sec.scrollIntoView({behavior:'smooth',block:'center'});}
+    [].slice.call(document.querySelectorAll('a[href="#location"]')).forEach(function(a){
+      a.addEventListener('click',function(e){
+        e.preventDefault();
+        if(history.replaceState)history.replaceState(null,'','#location');
+        center();
+      });
+    });
+    // 새로고침·외부 링크로 #location 직접 진입 시에도 (이미지 로드 후 높이 확정되면) 중앙으로
+    if(window.location.hash==='#location'){
+      window.addEventListener('load',function(){sec.scrollIntoView({block:'center'});});
+    }
+  })();
   // hero slider (콴다일로식 인디케이터 + 좌우 버튼)
   (function(){
     var track=document.getElementById('heroTrack');
