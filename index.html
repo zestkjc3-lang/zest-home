@@ -35,7 +35,7 @@
 
   .brand{display:inline-flex;align-items:center;gap:9px;font-weight:900;font-size:20px;color:var(--ink);letter-spacing:-.03em;white-space:nowrap;flex:none;min-width:0}
   .brand .mark{width:26px;height:30px;flex:none}
-  .brand .name{display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap}
+  .brand .name{display:inline-flex;flex-direction:column;align-items:flex-start;gap:1px;line-height:1.05;white-space:nowrap}
   .brand small{font-weight:800;font-size:10px;color:var(--gold);letter-spacing:.18em}
 
   header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
@@ -258,8 +258,8 @@
 <header>
   <div class="wrap nav">
     <a href="#top" class="brand">
-      <svg class="mark" viewBox="0 0 40 44" aria-hidden="true"><use href="#emblem"/></svg>
-      <span class="name">제스트에듀<small>ZESTEDU</small></span>
+      <img class="mark" src="images/logo-mark.png?v=1" alt="제스트에듀 로고" style="width:auto;height:26px" />
+      <span class="name">제스트에듀</span>
     </a>
     <nav class="menu">
       <a href="#about">학원소개</a>
