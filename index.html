@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>제스트에듀 ZEST EDU — 중·고등 영어 전문학원</title>
+<title>제스트에듀 ZESTEDU — 중·고등 영어 전문학원</title>
 <meta name="description" content="최상위권의 클래스, 제스트에듀. 중·고등 영어 전문학원. 학년별 반편성 · 수준별 지도 · 철저한 학습관리 · 맞춤형 커리큘럼. 부천 상동역 7번출구." />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
@@ -103,6 +103,10 @@
   .sec-head p{margin-top:16px;color:var(--muted);font-size:17.5px}
   .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
   .reveal.in{opacity:1;transform:none}
+
+  /* 약도 — 원본 520px 이라 확대하면 흐려짐. max-width 로 상한을 두어 등배 이하로만 표시 */
+  .map-card{max-width:520px;margin:0 auto;border-radius:18px;overflow:hidden;box-shadow:0 26px 60px -30px rgba(28,26,21,.32)}
+  .map-card img{width:100%;height:auto}
 
   /* features 4 pillars */
   .feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
@@ -291,7 +295,7 @@
   <svg class="hero-emblem" viewBox="0 0 40 44"><use href="#emblem"/></svg>
   <div class="hero-inner">
     <div class="hero-copy">
-      <span class="eyebrow">중·고등 영어 전문학원 · ZEST EDU</span>
+      <span class="eyebrow">중·고등 영어 전문학원 · ZESTEDU</span>
       <h1>최상위권의 <span class="g">클래스</span>, 제스트에듀</h1>
       <p class="sub">확실한 수능 1등급을 향한, 급이 다른 영어. 중·고등 내신부터 수능·정시까지.</p>
     </div>
@@ -346,7 +350,7 @@
 <section class="sec cream" id="about">
   <div class="wrap">
     <div class="sec-head reveal">
-      <span class="eyebrow">Why ZEST EDU</span>
+      <span class="eyebrow">Why ZESTEDU</span>
       <h2>제스트에듀의 네 가지 약속</h2>
       <p>중·고등 영어만 전문으로. 학생 한 명 한 명의 학년·수준에 정확히 맞춰 관리합니다.</p>
     </div>
@@ -455,8 +459,22 @@
   </div>
 </section>
 
+<!-- LOCATION -->
+<section class="sec cream" id="location">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Location</span>
+      <h2>찾아 오시는 길</h2>
+      <p>상동역 7번 출구에서 도보 5분 · 상3동 뱅뱅프라자 8층</p>
+    </div>
+    <div class="map-card reveal">
+      <img src="images/location-map.png?v=1" alt="제스트에듀 영광캠퍼스 약도 — 상동역 7번 출구, 상3동 뱅뱅프라자 8층" width="520" height="520" />
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
-<footer id="location">
+<footer>
   <div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand">
@@ -475,7 +493,7 @@
       <div>
         <h4>오시는 길</h4>
         <ul class="foot-info">
-          <li><b>제스트에듀 (ZEST EDU)</b></li>
+          <li><b>제스트에듀 (ZESTEDU)</b></li>
           <li>경기도 부천시 상동 · <b>상동역 7번출구 뱅뱅프라자 807호</b><br>(7호선 상동역 도보권)</li>
           <li>전화 <b>032-327-2287</b></li>
           <li>이메일 <b>zestedu@naver.com</b></li>
@@ -483,7 +501,7 @@
       </div>
     </div>
     <div class="foot-bottom">
-      <span>© 2026 제스트에듀 (ZEST EDU). All rights reserved.</span>
+      <span>© 2012 제스트에듀 (ZESTEDU). All rights reserved.</span>
       <span>부천 상동 · 중·고등 영어 전문학원</span>
     </div>
   </div>
