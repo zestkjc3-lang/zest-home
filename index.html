@@ -105,9 +105,35 @@
   .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
   .reveal.in{opacity:1;transform:none}
 
-  /* 약도 — 원본 520px 이라 확대하면 흐려짐. max-width 로 상한을 두어 등배 이하로만 표시 */
-  .map-card{max-width:520px;margin:0 auto;border-radius:18px;overflow:hidden;box-shadow:0 26px 60px -30px rgba(28,26,21,.32)}
-  .map-card img{width:100%;height:auto}
+  /* 오시는 길 — 브랜드 팔레트 카드 (7호선 노선 스트립 + 정보 패널) */
+  .loc-card{max-width:940px;margin:0 auto;display:grid;grid-template-columns:1.12fr 1fr;background:var(--paper);border:1px solid var(--line);border-radius:26px;overflow:hidden;box-shadow:0 30px 70px -34px rgba(28,26,21,.3)}
+  .loc-visual{position:relative;padding:44px 40px;background:linear-gradient(150deg,#f7f1e6,#efe5d2);display:flex;flex-direction:column;justify-content:center;gap:32px;overflow:hidden}
+  .loc-visual .emblem-bg{position:absolute;right:-24px;bottom:-34px;width:220px;opacity:.07;pointer-events:none}
+  .ln-badge{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.03em;color:#fff;background:var(--gold);padding:5px 13px;border-radius:999px;margin-bottom:22px}
+  .ln-track{position:relative;display:flex;justify-content:space-between;align-items:flex-start;z-index:1}
+  .ln-track::before{content:"";position:absolute;left:8%;right:8%;top:8px;height:4px;background:var(--gold-soft);border-radius:2px;opacity:.5}
+  .ln-stop{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:9px;flex:1;text-align:center}
+  .ln-stop i{width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--gold-soft)}
+  .ln-stop b{font-size:13px;font-weight:600;color:var(--muted)}
+  .ln-stop em{font-size:11px;font-style:normal;color:var(--gold-deep);font-weight:800}
+  .ln-stop.is-here i{width:20px;height:20px;margin-top:-3px;border-color:var(--gold);background:var(--gold);box-shadow:0 0 0 5px rgba(156,124,60,.16)}
+  .ln-stop.is-here b{color:var(--ink);font-weight:800;font-size:15px}
+  .loc-pin{position:relative;z-index:1;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.72);border:1px solid rgba(221,213,195,.85);border-radius:16px;padding:16px 18px}
+  .loc-pin .emb{width:32px;height:36px;flex:none}
+  .loc-pin b{display:block;font-size:15px;color:var(--ink);font-weight:800;line-height:1.35}
+  .loc-pin span{font-size:13px;color:var(--muted)}
+  .loc-info{padding:44px 40px;display:flex;flex-direction:column;justify-content:center}
+  .loc-info h3{font-size:22px;font-weight:800;margin-bottom:22px}
+  .loc-info ul{list-style:none;display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
+  .loc-info li{display:flex;align-items:flex-start;gap:13px;font-size:15px;color:var(--text);line-height:1.5}
+  .loc-info li svg{width:20px;height:20px;flex:none;color:var(--gold);margin-top:1px}
+  .loc-info li b{color:var(--ink);font-weight:700}
+  .loc-cta{display:flex;gap:10px;flex-wrap:wrap}
+  @media(max-width:760px){
+    .loc-card{grid-template-columns:1fr;max-width:520px}
+    .loc-visual{padding:34px 26px;gap:26px}
+    .loc-info{padding:32px 26px}
+  }
 
   /* features 4 pillars */
   .feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
@@ -470,8 +496,35 @@
       <h2>찾아 오시는 길</h2>
       <p>상동역 7번 출구에서 도보 5분 · 상3동 뱅뱅프라자 8층</p>
     </div>
-    <div class="map-card reveal">
-      <img src="images/location-map.png?v=1" alt="제스트에듀 영광캠퍼스 약도 — 상동역 7번 출구, 상3동 뱅뱅프라자 8층" width="520" height="520" />
+    <div class="loc-card reveal">
+      <div class="loc-visual">
+        <svg class="emblem-bg" viewBox="0 0 40 44" aria-hidden="true"><use href="#emblem"/></svg>
+        <div class="loc-line">
+          <span class="ln-badge">지하철 7호선</span>
+          <div class="ln-track">
+            <div class="ln-stop"><i></i><b>삼산체육관</b></div>
+            <div class="ln-stop is-here"><i></i><b>상동역</b><em>7번 출구</em></div>
+            <div class="ln-stop"><i></i><b>부천시청</b></div>
+          </div>
+        </div>
+        <div class="loc-pin">
+          <svg class="emb" viewBox="0 0 40 44" aria-hidden="true"><use href="#emblem"/></svg>
+          <div><b>제스트에듀 영광캠퍼스</b><span>상3동 뱅뱅프라자 8층 · 도보 5분</span></div>
+        </div>
+      </div>
+      <div class="loc-info">
+        <h3>제스트에듀 영광캠퍼스</h3>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg><span>경기도 부천시 상동 · <b>뱅뱅프라자 806·807호 (8층)</b></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"/><path d="m9 15-1-1"/><path d="m15 15 1-1"/><path d="M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z"/><path d="m8 19-2 3"/><path d="m16 19 2 3"/></svg><span><b>7호선 상동역 7번 출구</b>에서 도보 5분</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg><span>전화 <b>032-327-2287</b></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><span>카카오톡 문의 <b>zestedu</b></span></li>
+        </ul>
+        <div class="loc-cta">
+          <a class="btn btn-gold btn-sm" href="tel:0323272287">전화 상담</a>
+          <a class="btn btn-ghost btn-sm" href="#contact">상담 예약</a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
