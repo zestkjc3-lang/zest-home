@@ -89,7 +89,7 @@
 
   /* quick tiles */
   .tiles{position:relative;z-index:2;background:var(--paper);border-bottom:1px solid var(--line)}
-  .tiles .wrap{display:flex;gap:30px;overflow-x:auto;padding:34px 26px 40px;scrollbar-width:none;justify-content:center}
+  .tiles .wrap{display:flex;flex-wrap:wrap;gap:26px 30px;padding:34px 26px 40px;justify-content:center}
   .tiles .wrap::-webkit-scrollbar{display:none}
   .tile{flex:0 0 auto;text-align:center;width:104px;cursor:pointer}
   .tile .ic{width:84px;height:84px;margin:0 auto 12px;border-radius:24px;background:var(--cream);border:1px solid var(--line);display:grid;place-items:center;color:var(--gold);transition:.2s}
