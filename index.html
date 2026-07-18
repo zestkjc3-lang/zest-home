@@ -213,6 +213,17 @@
   .tmodal.open{display:flex}
   .tmodal-box{background:var(--paper);border-radius:26px;max-width:820px;width:100%;overflow:hidden;display:grid;grid-template-columns:300px 1fr;box-shadow:0 40px 100px -30px rgba(0,0,0,.5);animation:pop .25s ease}
   @keyframes pop{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  /* SMS 안내 모달 (PC 전용) */
+  .sms-modal{position:fixed;inset:0;z-index:95;background:rgba(24,21,15,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:24px}
+  .sms-modal.open{display:flex}
+  .sms-box{position:relative;background:var(--paper);border-radius:24px;max-width:360px;width:100%;padding:38px 30px 32px;text-align:center;box-shadow:0 40px 100px -30px rgba(0,0,0,.5);animation:pop .25s ease}
+  .sms-box .sms-ic{width:60px;height:60px;margin:0 auto 18px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#f6efe0,#efe4cd);color:var(--gold-deep)}
+  .sms-box .sms-ic svg{width:30px;height:30px}
+  .sms-box h3{font-size:20px;font-weight:800;margin-bottom:10px}
+  .sms-box p{font-size:14.5px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+  .sms-box .num{font-weight:800;color:var(--ink)}
+  .sms-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border:0;background:var(--cream);border-radius:50%;color:var(--muted);font-size:15px;cursor:pointer;line-height:1;display:grid;place-items:center}
+  .sms-x:hover{background:var(--fill);color:var(--ink)}
   .tmodal-photo{position:relative;background:#fff;min-height:420px}
   .tmodal-photo img{width:100%;height:100%;object-fit:contain;object-position:center center;position:absolute;inset:0}
   .tmodal-photo .label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted-2);text-align:center;padding:14px}
@@ -598,6 +609,17 @@
   <a class="tel" href="tel:010-7643-2287"><span class="lbl">상담전화</span> ☎</a>
 </div>
 
+<!-- SMS 안내 모달 (PC 전용) -->
+<div class="sms-modal" id="smsModal" aria-hidden="true">
+  <div class="sms-box" role="dialog" aria-modal="true" aria-labelledby="smsModalTitle">
+    <button class="sms-x" id="smsModalX" type="button" aria-label="닫기">✕</button>
+    <div class="sms-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg></div>
+    <h3 id="smsModalTitle">문자 상담은 모바일에서</h3>
+    <p>휴대폰에서 문자 버튼을 누르면 바로 문자 메시지를 보낼 수 있어요.<br>전화 문의 <span class="num">032-327-2287</span></p>
+    <button class="btn btn-gold btn-sm" type="button" id="smsModalOk">확인</button>
+  </div>
+</div>
+
 <!-- LEVEL TEST BOOKING MODAL -->
 <div class="fmodal" id="levelModal" aria-hidden="true">
   <div class="fmodal-box" role="dialog" aria-modal="true" aria-labelledby="levelModalTitle">
@@ -659,6 +681,26 @@
 </div>
 
 <script>
+  // 문자(SMS) 버튼 — 모바일이면 문자앱, PC면 안내 모달
+  (function(){
+    var modal=document.getElementById('smsModal');
+    if(!modal)return;
+    function isMobile(){
+      var ua=navigator.userAgent||'';
+      return /Android|iPhone|iPad|iPod|IEMobile|Opera Mini|Mobile/i.test(ua)
+        || (/Macintosh/i.test(ua) && navigator.maxTouchPoints>1);
+    }
+    function open(){modal.classList.add('open');modal.setAttribute('aria-hidden','false');}
+    function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');}
+    [].slice.call(document.querySelectorAll('a[href^="sms:"]')).forEach(function(a){
+      a.addEventListener('click',function(e){ if(!isMobile()){e.preventDefault();open();} });
+    });
+    var x=document.getElementById('smsModalX'); if(x)x.addEventListener('click',close);
+    var ok=document.getElementById('smsModalOk'); if(ok)ok.addEventListener('click',close);
+    modal.addEventListener('click',function(e){ if(e.target===modal)close(); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape')close(); });
+  })();
+
   // ===== 강사 데이터 (여기만 수정하면 카드+모달 모두 반영) =====
   var TEACHERS = [
     {
