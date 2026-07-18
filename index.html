@@ -119,7 +119,7 @@
   .ln-stop.is-here i{width:20px;height:20px;margin-top:-3px;border-color:var(--gold);background:var(--gold);box-shadow:0 0 0 5px rgba(156,124,60,.16)}
   .ln-stop.is-here b{color:var(--ink);font-weight:800;font-size:15px}
   .loc-pin{position:relative;z-index:1;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.72);border:1px solid rgba(221,213,195,.85);border-radius:16px;padding:16px 18px}
-  .loc-pin .emb{width:32px;height:36px;flex:none}
+  .loc-pin .emb{width:auto;height:38px;flex:none;object-fit:contain}
   .loc-pin b{display:block;font-size:15px;color:var(--ink);font-weight:800;line-height:1.35}
   .loc-pin span{font-size:13px;color:var(--muted)}
   .loc-info{padding:44px 40px;display:flex;flex-direction:column;justify-content:center}
@@ -213,7 +213,8 @@
   .tmodal-photo .label small{font-size:12.5px;font-weight:700}
   .tmodal-photo img[src]:not([src=""]) + .label{display:none}
   .tmodal-info{padding:34px 34px 38px;position:relative}
-  .tmodal-x{position:absolute;right:16px;top:14px;background:none;border:0;font-size:28px;color:var(--muted);cursor:pointer;line-height:1;z-index:3}
+  .tmodal-x{position:fixed;right:2px;top:6px;z-index:95;background:none;border:0;font-size:30px;font-weight:300;color:#fff;cursor:pointer;line-height:1;padding:2px 6px;text-shadow:0 1px 6px rgba(0,0,0,.45)}
+  .tmodal-x:hover{opacity:.85}
   .tmodal-info .role{font-size:13px;font-weight:800;color:var(--gold);letter-spacing:.08em}
   .tmodal-info h3{font-size:30px;font-weight:900;margin:6px 0 2px}
   .tmodal-info h3 .t{color:inherit;font-size:inherit;margin-left:0;font-weight:inherit}
@@ -508,7 +509,7 @@
           </div>
         </div>
         <div class="loc-pin">
-          <svg class="emb" viewBox="0 0 40 44" aria-hidden="true"><use href="#emblem"/></svg>
+          <img class="emb" src="images/logo-mark.png?v=1" alt="제스트에듀 로고" />
           <div><b>제스트에듀 영광캠퍼스</b><span>상3동 뱅뱅프라자 8층 · 도보 5분</span></div>
         </div>
       </div>
@@ -570,8 +571,8 @@
 
 <!-- TEACHER MODAL -->
 <div class="tmodal" id="tmodal">
+  <button class="tmodal-x" id="tmodalX" aria-label="닫기">×</button>
   <div class="tmodal-box">
-    <button class="tmodal-x" id="tmodalX" aria-label="닫기">×</button>
     <div class="tmodal-photo"><img id="tmPhoto" alt="" onerror="this.removeAttribute('src')"/><div class="label" id="tmLabel">📷<small></small></div></div>
     <div class="tmodal-info">
       <span class="role" id="tmRole">영어 전문 강사</span>
