@@ -303,10 +303,11 @@
   .foot-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:26px;flex-wrap:wrap;gap:10px;color:var(--muted-2);font-size:13px}
 
   .float{position:fixed;right:22px;bottom:22px;z-index:60;display:flex;flex-direction:column;gap:11px}
-  .float a{display:flex;align-items:center;gap:8px;padding:13px 20px;border-radius:999px;font-weight:800;font-size:15px;box-shadow:0 14px 32px -10px rgba(28,26,21,.4);transition:.15s}
+  .float a{display:flex;align-items:center;gap:8px;padding:13px 20px;border-radius:999px;font-weight:800;font-size:15px;box-shadow:0 14px 32px -10px rgba(28,26,21,.4);transition:.15s;color:#fff}
   .float a:hover{transform:translateY(-2px)}
-  .float .primary{background:var(--ink);color:#fff}
-  .float .tel{background:var(--gold);color:#fff}
+  .float .primary{background:var(--ink)}
+  .float .tel{background:var(--gold)}
+  .float .ic{width:20px;height:20px;flex-shrink:0;display:block}
 
   @media(max-width:900px){
     nav.menu,.nav .tel{display:none}
@@ -319,6 +320,8 @@
     .prog-grid,.blog-grid,.foot-grid{grid-template-columns:1fr}
     .row-head{flex-direction:column;align-items:flex-start;gap:18px}
     .float a .lbl{display:none}
+    .float a{padding:14px;justify-content:center}
+    .float .ic{width:22px;height:22px}
     .sec{padding:76px 0}
     .tmodal-box{grid-template-columns:1fr}
     .tmodal-photo{min-height:300px;aspect-ratio:4/3}
@@ -541,21 +544,6 @@
   </div>
 </section>
 
-<!-- CTA -->
-<section class="cta" id="contact">
-  <div class="wrap">
-    <div class="cta-box reveal">
-      <h2>지금, 최상위권으로 가는 첫 걸음</h2>
-      <p>레벨테스트 예약과 상담을 도와드립니다. 편하게 문의하세요.</p>
-      <div class="btns">
-        <a href="tel:010-7643-2287" class="btn btn-gold">☎ 전화 문의</a>
-        <a href="sms:01076432287?body=제스트에듀 상담 문의드립니다." class="btn btn-ghost">💬 문자 문의</a>
-      </div>
-      <a href="tel:010-7643-2287" class="cta-phone">전화 <b>032-327-2287</b></a>
-    </div>
-  </div>
-</section>
-
 <!-- LOCATION -->
 <section class="sec cream" id="location">
   <div class="wrap">
@@ -597,6 +585,21 @@
   </div>
 </section>
 
+<!-- CTA -->
+<section class="cta" id="contact">
+  <div class="wrap">
+    <div class="cta-box reveal">
+      <h2>지금, 최상위권으로 가는 첫 걸음</h2>
+      <p>레벨테스트 예약과 상담을 도와드립니다. 편하게 문의하세요.</p>
+      <div class="btns">
+        <a href="tel:010-7643-2287" class="btn btn-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1.05em;height:1.05em;margin-right:6px;flex-shrink:0"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>전화 문의</a>
+        <a href="sms:01076432287?body=제스트에듀 상담 문의드립니다." class="btn btn-ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1.05em;height:1.05em;margin-right:6px;flex-shrink:0"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>문자 문의</a>
+      </div>
+      <a href="tel:010-7643-2287" class="cta-phone">전화 <b>032-327-2287</b></a>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="wrap">
@@ -632,8 +635,14 @@
 </footer>
 
 <div class="float">
-  <a class="tel" href="tel:010-7643-2287"><span class="lbl">전화상담</span> ☎</a>
-  <a class="primary" href="sms:01076432287?body=제스트에듀 상담 문의드립니다."><span class="lbl">문자상담</span> 💬</a>
+  <a class="tel" href="tel:010-7643-2287" aria-label="전화상담">
+    <span class="lbl">전화상담</span>
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
+  </a>
+  <a class="primary" href="sms:01076432287?body=제스트에듀 상담 문의드립니다." aria-label="문자상담">
+    <span class="lbl">문자상담</span>
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+  </a>
 </div>
 
 <!-- SMS 안내 모달 (PC 전용) -->
