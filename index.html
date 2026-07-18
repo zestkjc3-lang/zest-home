@@ -618,8 +618,8 @@
   <div class="sms-box" role="dialog" aria-modal="true" aria-labelledby="smsModalTitle">
     <button class="sms-x" id="smsModalX" type="button" aria-label="닫기">✕</button>
     <div class="sms-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg></div>
-    <h3 id="smsModalTitle">문자 상담은 모바일에서</h3>
-    <p>휴대폰에서 문자 버튼을 누르면 바로 문자 메시지를 보낼 수 있어요.<br>전화 문의 <span class="num">032-327-2287</span></p>
+    <h3 id="smsModalTitle">모바일에서 이용 가능</h3>
+    <p id="smsModalMsg">휴대폰에서 눌러 주세요.<br>전화 문의 <span class="num">032-327-2287</span></p>
     <button class="btn btn-gold btn-sm" type="button" id="smsModalOk">확인</button>
   </div>
 </div>
@@ -685,19 +685,31 @@
 </div>
 
 <script>
-  // 문자(SMS) 버튼 — 모바일이면 문자앱, PC면 안내 모달
+  // 전화·문자 버튼 — 모바일이면 통화/문자앱, PC면 안내 모달
   (function(){
     var modal=document.getElementById('smsModal');
     if(!modal)return;
+    var titleEl=document.getElementById('smsModalTitle');
+    var msgEl=document.getElementById('smsModalMsg');
+    var COPY={
+      tel:{title:'전화 상담은 모바일에서',line:'휴대폰에서 전화 버튼을 누르면 바로 전화를 걸 수 있어요.'},
+      sms:{title:'문자 상담은 모바일에서',line:'휴대폰에서 문자 버튼을 누르면 바로 문자 메시지를 보낼 수 있어요.'}
+    };
     function isMobile(){
       var ua=navigator.userAgent||'';
       return /Android|iPhone|iPad|iPod|IEMobile|Opera Mini|Mobile/i.test(ua)
         || (/Macintosh/i.test(ua) && navigator.maxTouchPoints>1);
     }
-    function open(){modal.classList.add('open');modal.setAttribute('aria-hidden','false');}
+    function open(type){
+      var c=COPY[type]||COPY.sms;
+      if(titleEl)titleEl.textContent=c.title;
+      if(msgEl)msgEl.innerHTML=c.line+'<br>전화 문의 <span class="num">032-327-2287</span>';
+      modal.classList.add('open');modal.setAttribute('aria-hidden','false');
+    }
     function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');}
-    [].slice.call(document.querySelectorAll('a[href^="sms:"]')).forEach(function(a){
-      a.addEventListener('click',function(e){ if(!isMobile()){e.preventDefault();open();} });
+    [].slice.call(document.querySelectorAll('a[href^="sms:"],a[href^="tel:"]')).forEach(function(a){
+      var type=a.getAttribute('href').indexOf('tel:')===0?'tel':'sms';
+      a.addEventListener('click',function(e){ if(!isMobile()){e.preventDefault();open(type);} });
     });
     var x=document.getElementById('smsModalX'); if(x)x.addEventListener('click',close);
     var ok=document.getElementById('smsModalOk'); if(ok)ok.addEventListener('click',close);
