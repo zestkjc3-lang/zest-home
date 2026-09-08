@@ -3,18 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>2026학년도 1학기 중원고 영어 성과 — 제스트에듀</title>
-<meta name="description" content="제스트에듀 박지유T 중원고 영어 — 2026학년도 1학기 전교 1등 3명, 중간 100점 5명, 기말 100점 6명." />
+<title>중원고 영어, 결과가 다른 이유 — 제스트에듀 박지유T</title>
+<meta name="description" content="중원고 영어, 결과가 다른 이유. 기출 분석 · 학생별 보완 · 변형 대비 · 수행평가 만점 관리. 제스트에듀 박지유T." />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 <style>
   :root{
-    --paper:#ffffff;--cream:#faf7f1;
+    --paper:#ffffff;--cream:#faf7f1;--cream-2:#f3ede1;
     --ink:#1c1a15;--text:#514c41;
     --muted:#8b8574;
     --line:#ece6d9;--line-2:#ddd5c3;
     --gold:#9c7c3c;--gold-deep:#7c6127;
     --mark:#ffe56a;
+    --wine:#7d2f36;--wine-soft:#f6ecec;
     --maxw:820px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -36,15 +37,48 @@
   .panel{background:var(--paper);border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:0 18px 48px -28px rgba(28,26,21,.28)}
   .panel img{width:100%;height:auto;display:block;max-width:100%;object-fit:contain}
 
-  .article{margin-top:22px;background:var(--paper);border-radius:20px;border:1px solid var(--line);padding:34px 28px 40px;box-shadow:0 14px 40px -28px rgba(28,26,21,.22)}
-  .article p{font-size:16.5px;color:#2a271f;margin:0 0 1.05em;line-height:1.85}
+  .article{margin-top:22px;background:var(--paper);border-radius:20px;border:1px solid var(--line);padding:38px 30px 44px;box-shadow:0 14px 40px -28px rgba(28,26,21,.22)}
+  .eyebrow{display:inline-block;font-size:12.5px;font-weight:800;letter-spacing:.14em;color:var(--wine);margin-bottom:10px}
+  .article h1{font-size:clamp(24px,4.4vw,32px);font-weight:900;color:var(--ink);letter-spacing:-.04em;line-height:1.32;margin-bottom:18px}
+  .article h2{font-size:18px;font-weight:900;color:var(--ink);letter-spacing:-.03em;margin:8px 0 16px;text-align:center}
+  .lead p{font-size:17px;color:#2a271f;line-height:1.9;margin:0 0 .9em}
+  .lead p:last-child{margin-bottom:0}
+  .em{font-weight:800;color:var(--ink)}
+  .mark{background:var(--mark);padding:0 .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+  .hook{margin:28px 0 8px;padding:22px 18px;text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .hook p{font-size:clamp(18px,3.4vw,22px);font-weight:800;color:var(--wine);letter-spacing:-.03em;line-height:1.45}
+
+  .reasons{list-style:none;display:flex;flex-direction:column;gap:14px;margin:22px 0 8px}
+  .reasons li{background:var(--cream);border:1px solid var(--line);border-radius:18px;padding:20px 20px 18px}
+  .reasons .num{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;border-radius:999px;background:var(--wine);color:#fff;font-size:13px;font-weight:800;margin-right:8px;vertical-align:middle}
+  .reasons h3{display:inline;font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.025em;line-height:1.5}
+  .reasons p{font-size:15.5px;color:#3a362d;line-height:1.85;margin:10px 0 0}
+
+  .process{margin-top:36px;padding-top:8px}
+  .steps{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .steps li{background:linear-gradient(180deg,#fff,var(--cream));border:1px solid var(--line);border-radius:18px;padding:20px 16px 18px;text-align:center}
+  .steps .kicker{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.16em;color:var(--gold);margin-bottom:8px}
+  .steps h3{font-size:16.5px;font-weight:800;color:var(--ink);letter-spacing:-.03em;margin-bottom:8px;line-height:1.4}
+  .steps p{font-size:14.5px;color:#3a362d;line-height:1.75;text-align:left}
+  .steps .flow{display:none;background:none;border:0;padding:0}
+
+  .closing{margin-top:32px;padding:24px 22px 22px;background:var(--wine-soft);border-radius:18px}
+  .closing p{font-size:16.5px;color:#2a271f;line-height:1.9;margin:0 0 .85em}
+  .closing p:last-child{margin-bottom:0;font-weight:700;color:var(--ink)}
 
   .actions{margin-top:24px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
   .note{margin-top:16px;text-align:center;font-size:13.5px;color:var(--muted)}
 
+  @media(max-width:720px){
+    .steps{grid-template-columns:1fr}
+    .steps .flow{display:block;text-align:center;color:var(--gold);font-weight:800;margin:2px 0}
+  }
   @media(max-width:560px){
     .article{padding:26px 18px 32px}
     .title{display:none}
+    .reasons li{padding:18px 16px 16px}
+    .closing{padding:20px 16px}
   }
 </style>
 </head>
@@ -59,20 +93,80 @@
 
   <main>
     <div class="panel">
-      <img src="images/jungwon-hero.jpg?v=1" alt="2026학년도 1학기 중원고 영어 성과 — 전교 1등 3명, 제스트에듀 박지유T" width="1014" height="1024" />
+      <img src="images/jungwon-blog.jpg?v=1" alt="2026학년도 1학기 중원고 영어 성과 — 전교 1등 3명, 제스트에듀 박지유T" width="2041" height="2060" />
     </div>
 
     <article class="article">
-      <p>2026학년도 1학기, 중원고에서도 제스트에듀 학생들이 눈에 띄는 성과를 만들어 냈습니다.</p>
+      <span class="eyebrow">중원고 · 박지유T</span>
+      <h1>중원고 영어,<br>결과가 다른 이유</h1>
 
-      <p>1학기 합산 만점으로 전교 1등 3명을 배출했고, 중간 100점 5명 · 기말 100점 6명, 수행 만점 16명까지 — 상위권이 한두 명이 아니라 층으로 쌓인 결과입니다.</p>
+      <div class="lead">
+        <p>작년에 이어 2026학년도 1학기에도 압도적인 결과를 만들어냈습니다.</p>
+        <p>한두 명의 결과도, 한 번의 시험에서 나온 우연한 결과도 아닙니다. 꾸준히 좋은 결과가 이어지는 데에는 이유가 있습니다.</p>
+      </div>
 
-      <p>지문의 논리와 근거로 답을 찾는 수업, 학생별 약점 분석부터 서술형 완성까지 이어진 중원고 맞춤 내신 관리가 이번 성적의 바탕이 되었습니다.</p>
+      <div class="hook">
+        <p>“어떻게 이런 결과가 나왔을까요?”</p>
+      </div>
 
-      <p>끝까지 집중해 준 학생들에게 진심으로 축하와 박수를 보냅니다. 다음 시험에서도 제스트에듀 박지유T가 함께하겠습니다.</p>
+      <ol class="reasons">
+        <li>
+          <h3><span class="num">1</span>중원고 기출을 기준으로 출제 방향을 분석하고 예측합니다.</h3>
+          <p>단순히 시험 범위만 공부하지 않습니다. 중원고 기출을 바탕으로 어떤 방식으로 지문을 변형하는지, 어떤 포인트를 어법과 서술형으로 출제하는지 분석하고, 실제 출제 가능성이 높은 부분을 중심으로 준비합니다.</p>
+        </li>
+        <li>
+          <h3><span class="num">2</span>같은 시험을 준비해도, 학생마다 필요한 공부는 다릅니다.</h3>
+          <p>같은 점수를 받은 학생이라도 점수를 잃는 이유는 다를 수 있습니다. 서술형 문제 접근이 어려운 학생, 어법이 약한 학생, 문장 삽입 문제에 어려움을 느끼는 학생, 수행평가에서 점수를 놓치는 학생, 혹은 시간 관리가 어려운 학생까지.</p>
+          <p>그래서 지유T는 모든 학생에게 똑같은 공부를 반복시키지 않습니다. 현재 성적과 오답, 취약 유형을 분석해 학생마다 필요한 학습을 제시하고 보완합니다.</p>
+        </li>
+        <li>
+          <h3><span class="num">3</span>암기가 아니라, 실제 문제 변형에 대응하는 연습을 합니다.</h3>
+          <p>단순 워크북 형식의 문제를 많이 푸는 것만으로는 중원고의 변형 문제에 충분히 대비하기 어렵습니다. 패러프레이징된 빈칸과 어휘, 어법, 서술형까지 실제 시험의 출제 방식에 맞춰 제작한 자체 자료로 반복하며, 처음 보는 변형에도 흔들리지 않는 힘을 기릅니다.</p>
+        </li>
+        <li>
+          <h3><span class="num">4</span>상위권일수록 놓치기 쉬운 한 문제까지 준비합니다.</h3>
+          <p>중원고에서는 <span class="em">한 문제의 차이가 등급의 차이</span>로 이어질 수 있습니다. 고난도 서술형만 준비하는 것이 아니라, 알고도 틀릴 수 있는 어법 포인트와 실수하기 쉬운 부분까지 끝까지 확인합니다.</p>
+          <p>상위권에게 필요한 것은 더 많은 문제가 아니라, 틀릴지도 모르는 한 문제를 줄이는 공부입니다.</p>
+        </li>
+        <li>
+          <h3><span class="num">5</span>수행평가는 만점을 목표로 관리합니다.</h3>
+          <p>내신은 지필평가만으로 결정되지 않습니다. 수행평가에서 놓친 1점이 최종 등급을 가를 수 있기 때문에, 받을 수 있는 수행평가 점수는 모두 확보하는 것을 원칙으로 합니다.</p>
+          <p>수행평가의 일정과 평가 요소를 확인하고, 필요한 부분을 꼼꼼하게 점검하여 지필평가를 치르기 전부터 내신 점수를 지켜갑니다.</p>
+        </li>
+      </ol>
+
+      <div class="process">
+        <h2>READY · SET · GO</h2>
+        <ol class="steps">
+          <li>
+            <span class="kicker">STEP 1 · READY</span>
+            <h3>지문을 정확하게 이해합니다.</h3>
+            <p>무지성 암기가 아니라 문장 구조와 핵심 어법, 논리 전개까지 정확하게 학습합니다.</p>
+          </li>
+          <li class="flow" aria-hidden="true">↓</li>
+          <li>
+            <span class="kicker">STEP 2 · SET</span>
+            <h3>시험에 나올 수 있는 변형에 대비합니다.</h3>
+            <p>효과 없는 단순 반복 대신, 지유T가 직접 선별·제작한 패러프레이징 · 어법 · 빈칸 · 서술형 등 다양한 변형 문제를 통해 실제 시험에 대응하는 힘을 만듭니다.</p>
+          </li>
+          <li class="flow" aria-hidden="true">↓</li>
+          <li>
+            <span class="kicker">STEP 3 · GO</span>
+            <h3>실수 없이 실전까지 완성합니다.</h3>
+            <p>중원고 출제 유형에 맞춘 자체 실전 서술형 문제와 학생별 취약 유형에 맞춘 추가 문제를 통해, 실제 시험에서 최대한의 점수로 연결될 수 있도록 마지막까지 완성합니다.</p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="closing">
+        <p>중원고 영어 시험은 겉으로 보기에는 어렵지 않아 보일 수 있습니다. 하지만 <span class="mark">높은 점수를 받는 것과 원하는 등급을 받는 것은 다른 문제</span>입니다.</p>
+        <p>학교의 출제 방향을 정확하게 알고, 각 학생이 점수를 잃는 이유를 찾아 하나씩 해결해야 합니다.</p>
+        <p>한 명 한 명의 가능성을 놓치지 않고, 모든 아이들이 자신의 잠재력을 최대한 발휘할 수 있도록.</p>
+      </div>
     </article>
 
     <div class="actions">
+      <a class="btn" href="index.html#contact">상담 문의하기</a>
       <a class="btn ghost" href="index.html">홈으로 돌아가기</a>
     </div>
     <p class="note">부천 상동역 7번출구 뱅뱅프라자 806, 807호 · 032-327-2287</p>
