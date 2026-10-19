@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>상장 만들기 — 제스트에듀</title>
+<link rel="icon" href="/favicon.ico?v=2" sizes="any" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{--ink:#1c1a15;--muted:#6b6558;--line:#e3ddcf;--bg:#f6f3ec;--paper:#fff;--gold:#b99a57;--blue:#2f6fed;--red:#d9480f;--green:#2b8a3e}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:Pretendard,system-ui,sans-serif;color:var(--ink);background:var(--bg);font-size:15px}
+  button,input,textarea,select{font:inherit;color:inherit}
+  button{cursor:pointer}
+  .hidden{display:none!important}
+  .topbar{display:flex;align-items:center;gap:10px;padding:12px 18px;background:var(--paper);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;flex-wrap:wrap}
+  .topbar h1{font-size:18px;margin:0}
+  .topbar a{color:var(--muted);text-decoration:none;font-weight:600;font-size:14px}
+  .topbar .spacer{flex:1}
+  .btn{border:1px solid var(--line);background:var(--paper);padding:10px 16px;border-radius:10px;font-weight:700}
+  .btn:hover{border-color:#cbbf9f}
+  .btn-primary{background:var(--green);border-color:var(--green);color:#fff}
+  .btn-primary:disabled{background:#a5c9ae;border-color:#a5c9ae;cursor:default}
+  .layout{display:grid;grid-template-columns:400px minmax(0,1fr);gap:0;min-height:calc(100vh - 58px)}
+  .side{background:var(--paper);border-right:1px solid var(--line);padding:18px}
+  .step{margin-bottom:22px}
+  .step h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .step h2 i{font-style:normal;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;font-size:13px}
+  .designs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .designs button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:6px;text-align:center;font-size:12.5px;font-weight:700;color:var(--muted)}
+  .designs button img{display:block;width:100%;aspect-ratio:1/1;object-fit:contain;background:#f4efe4;border-radius:8px;margin-bottom:6px}
+  .designs button[aria-pressed="true"]{border-color:var(--blue);color:var(--ink);box-shadow:0 0 0 3px rgba(47,111,237,.15)}
+  .field input[type=text],.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .field textarea{min-height:200px;resize:vertical;font-family:ui-monospace,Menlo,monospace;font-size:13.5px;line-height:1.6;white-space:pre}
+  .hint{display:block;font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.55}
+  .hint b{color:var(--ink)}
+  .file{display:inline-block;margin-top:8px;font-size:13.5px;font-weight:700;color:var(--blue);cursor:pointer}
+  .file input{display:none}
+  .check{display:flex;align-items:center;gap:8px;font-size:14px;margin-top:8px}
+  .msg{font-size:13.5px;margin-top:8px;line-height:1.5}
+  .msg.err{color:var(--red)}
+  .msg.ok{color:var(--green)}
+  .main{padding:18px;min-width:0}
+  .main-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .main-head .count{font-weight:800}
+  .main-head .spacer{flex:1}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card,200px),1fr));gap:14px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+  .card canvas{display:block;width:100%;height:auto;background:#eee}
+  .card .meta{display:flex;align-items:center;gap:6px;padding:8px 10px;font-size:13px;border-top:1px solid var(--line)}
+  .card .meta span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+  .card .meta button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;font-size:12.5px;font-weight:700}
+  .empty{border:2px dashed var(--line);border-radius:14px;padding:50px 20px;text-align:center;color:var(--muted);line-height:1.7}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;z-index:50;max-width:calc(100% - 32px)}
+  @media (max-width:900px){
+    .layout{grid-template-columns:minmax(0,1fr)}
+    .side{border-right:0;border-bottom:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <h1>상장 만들기</h1>
+  <a href="./">← 홈페이지 편집으로</a>
+  <span class="spacer"></span>
+</header>
+
+<div class="layout">
+  <aside class="side">
+    <section class="step">
+      <h2><i>1</i>디자인 고르기</h2>
+      <div class="designs" id="designs"></div>
+    </section>
+
+    <section class="step field">
+      <h2><i>2</i>시험명</h2>
+      <input type="text" id="examInput" value="2026년 1학기 기말고사" />
+      <span class="hint">모든 상장에 똑같이 들어가요.</span>
+    </section>
+
+    <section class="step field">
+      <h2><i>3</i>명단 붙여넣기</h2>
+      <textarea id="listInput" spellcheck="false" placeholder="100&#9;중원고3&#9;노O희&#10;99&#9;중원고1&#9;양O민"></textarea>
+      <span class="hint">엑셀에서 <b>점수 · 학교 · 이름</b> 세 칸을 드래그해 복사한 뒤 여기에 붙여넣으세요. 한 줄에 한 명이에요.<br>
+        <span id="noteHint">세로 상장은 네 번째 칸(<b>비고</b>)에 「전교 1등」처럼 적으면 점수 위에 한 줄이 더 들어가요.</span></span>
+      <label class="file">📄 엑셀·CSV 파일로 불러오기<input type="file" id="fileInput" accept=".xlsx,.xls,.csv" /></label>
+      <label class="check hidden" id="sortRow"><input type="checkbox" id="sortInput" checked /> 점수 높은 순으로 정렬</label>
+      <div class="msg" id="parseMsg"></div>
+    </section>
+  </aside>
+
+  <main class="main">
+    <div class="main-head">
+      <span class="count" id="countText">미리보기</span>
+      <span class="spacer"></span>
+      <button class="btn hidden" type="button" id="pdfBtn">PDF로 한 번에 (인쇄용)</button>
+      <button class="btn btn-primary" type="button" id="zipBtn" disabled>전체 다운로드 (ZIP)</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </main>
+</div>
+<div class="toast hidden" id="toast"></div>
+
+<script>
+(function(){
+  var BG='../images/certificates/';
+  // 글자 위치·크기는 미리캔버스 원본을 재서 맞춘 값 (단위: 결과 이미지 픽셀)
+  var GOLD_DARK=['#8a7d4f','#6a6037','#4f4826','#6b6239','#8f8352'];   // 세로 상장 점수: 어두운 올리브 금색
+  var INK_DARK=['#5f5842','#433e2d','#3a3627','#4d4733'];               // 세로 상장 학교·이름
+  var GOLD_LIGHT=['#fff6d5','#f1d58c','#d4a94f','#b88a35','#f3dc9c'];
+  var GOLD_METAL=['#fff4cc','#f1d48a','#cfa04a','#8f6926','#c9a457'];  // 축하 배너: 아래쪽이 어두운 금속 금색
+  var DESIGNS={
+    certificate:{
+      label:'세로 상장',sub:'18×26cm 인쇄용',bg:BG+'certificate-bg.png',w:2040,h:2949,card:'190px',
+      file:'상장',perPage:1,pdf:{w:180,h:260},
+      draw:function(ctx,row,exam){
+        var serif='"Nanum Myeongjo", serif';
+        text(ctx,exam,1032,999,{family:serif,weight:800,size:88,spacing:.21,fill:'#9a7b3e'});
+        if(row.note){
+          text(ctx,row.note,1030,1280,{family:serif,weight:800,size:219,spacing:.1,stretch:1.1,fill:GOLD_DARK});
+          text(ctx,score(row.score),1030,1562,{family:serif,weight:800,size:192,spacing:.1,stretch:1.1,fill:GOLD_DARK});
+          text(ctx,row.school,1030,1818,{family:serif,weight:800,size:120,spacing:.1,stretch:1.15,fill:INK_DARK});
+          text(ctx,row.name,1030,1998,{family:serif,weight:800,size:120,spacing:.1,stretch:1.15,fill:INK_DARK});
+        }else{
+          text(ctx,score(row.score),1030,1337,{family:serif,weight:800,size:234,spacing:.1,stretch:1.1,fill:GOLD_DARK});
+          text(ctx,row.school,1030,1610,{family:serif,weight:800,size:150,spacing:.1,stretch:1.15,fill:INK_DARK});
+          text(ctx,row.name,1030,1829,{family:serif,weight:800,size:150,spacing:.1,stretch:1.15,fill:INK_DARK});
+        }
+      }
+    },
+    honor:{
+      label:'성적 발표',sub:'명예의 전당 (최대 24명)',bg:BG+'honor-bg.jpg',w:1365,h:1365,card:'340px',
+      file:'성적발표',perPage:24,sortable:true,
+      draw:function(ctx,rows,exam){
+        var sans='Pretendard, sans-serif';
+        text(ctx,exam,686,134,{family:sans,weight:700,size:78,spacing:-.01,fill:GOLD_LIGHT,shadow:'rgba(0,0,0,.55)'});
+        rows.forEach(function(r,i){
+          var col=i<12?0:1,row=i%12,y=450+row*62.8;
+          var sx=col?702:190,nx=col?1015:471;
+          text(ctx,score(r.score),sx,y,{family:sans,weight:800,size:40,spacing:.065,fill:'#3a2a0c',align:'left'});
+          text(ctx,r.school+' '+r.name,nx,y,{family:sans,weight:400,size:40,spacing:.065,fill:'#3a2a0c'});
+        });
+      }
+    },
+    banner:{
+      label:'축하 배너',sub:'1920×1080 가로형',bg:BG+'banner-bg.jpg',w:1920,h:1080,card:'300px',
+      file:'축하배너',perPage:1,
+      draw:function(ctx,row,exam){
+        var sans='Pretendard, sans-serif';
+        text(ctx,exam,960,386,{family:sans,weight:400,size:45,spacing:.12,fill:'#ecd9a6'});
+        text(ctx,score(row.score),960,575,{family:sans,weight:500,size:213,spacing:-.035,fill:GOLD_METAL});
+        text(ctx,row.school,960,716,{family:sans,weight:500,size:80,spacing:.03,fill:GOLD_METAL});
+        text(ctx,row.name,960,804,{family:sans,weight:500,size:80,spacing:.06,fill:GOLD_METAL});
+      }
+    }
+  };
+  var ORDER=['certificate','honor','banner'];
+  var $=function(id){return document.getElementById(id);};
+  var design='certificate',rows=[],pages=[],bgCache={},renderToken=0;
+
+  function score(s){s=String(s||'').trim();return s&&!/점$/.test(s)?s+'점':s;}
+
+  // 글자 한 줄을 가운데 정렬로 그린다 (자간 직접 계산, 금색은 위→아래 그라데이션)
+  function text(ctx,str,cx,cy,o){
+    str=String(str||'').trim(); if(!str)return;
+    ctx.save();
+    ctx.font=o.weight+' '+o.size+'px '+o.family;
+    ctx.textBaseline='middle';ctx.textAlign='left';
+    var st=o.stretch||1,sp=(o.spacing||0)*o.size,chars=Array.from(str),widths=chars.map(function(c){return ctx.measureText(c).width*st;});
+    var total=widths.reduce(function(a,b){return a+b;},0)+sp*(chars.length-1);
+    var x=o.align==='left'?cx:cx-total/2;
+    if(Array.isArray(o.fill)){
+      var g=ctx.createLinearGradient(0,cy-o.size*.5,0,cy+o.size*.5);
+      o.fill.forEach(function(c,i){g.addColorStop(i/(o.fill.length-1),c);});
+      ctx.fillStyle=g;
+    }else ctx.fillStyle=o.fill;
+    if(o.shadow){ctx.shadowColor=o.shadow;ctx.shadowBlur=o.size*.12;ctx.shadowOffsetY=o.size*.04;}
+    chars.forEach(function(c,i){
+      if(st===1)ctx.fillText(c,x,cy);
+      else{ctx.save();ctx.translate(x,cy);ctx.scale(st,1);ctx.fillText(c,0,0);ctx.restore();}
+      x+=widths[i]+sp;
+    });
+    ctx.restore();
+  }
+
+  function loadBg(src){
+    if(!bgCache[src])bgCache[src]=new Promise(function(res,rej){var im=new Image();im.onload=function(){res(im);};im.onerror=rej;im.src=src;});
+    return bgCache[src];
+  }
+  var fontsReady=Promise.all([
+    '800 100px "Nanum Myeongjo"','400 100px Pretendard','500 100px Pretendard','700 100px Pretendard','800 100px Pretendard'
+  ].map(function(f){return document.fonts.load(f,'가나다0123점');})).catch(function(){});
+
+  // ----- 명단 읽기 -----
+  function parseRows(lines){
+    var out=[],errors=[];
+    lines.forEach(function(cells,i){
+      cells=cells.map(function(c){return String(c==null?'':c).trim();});
+      if(!cells.some(Boolean))return;
+      if(i===0&&!/\d/.test(cells[0]))return; // 맨 위 머리글 줄(점수/학교/이름) 건너뛰기
+      if(cells.length<3||!cells[0]||!cells[2]){errors.push((i+1)+'번째 줄');return;}
+      out.push({score:cells[0],school:cells[1],name:cells[2],note:cells[3]||''});
+    });
+    return {rows:out,errors:errors};
+  }
+  function fromText(t){
+    var lines=t.replace(/\r/g,'').split('\n').map(function(l){return l.split(/\t|,(?=(?:[^"]*"[^"]*")*[^"]*$)|\s{2,}/);});
+    return parseRows(lines);
+  }
+  function setRows(r){
+    rows=r.rows;
+    var m=$('parseMsg');
+    if(!rows.length){m.className='msg';m.textContent='';}
+    else if(r.errors.length){m.className='msg err';m.textContent=rows.length+'명 읽음 · 칸이 모자란 줄은 빠졌어요: '+r.errors.slice(0,5).join(', ');}
+    else{m.className='msg ok';m.textContent='✓ '+rows.length+'명을 읽었어요.';}
+    render();
+  }
+  var typingTimer;
+  $('listInput').addEventListener('input',function(){clearTimeout(typingTimer);typingTimer=setTimeout(function(){setRows(fromText($('listInput').value));},250);});
+  $('examInput').addEventListener('input',function(){clearTimeout(typingTimer);typingTimer=setTimeout(render,250);});
+  $('sortInput').addEventListener('change',render);
+  $('fileInput').addEventListener('change',function(){
+    var f=this.files&&this.files[0];if(!f)return;
+    var fr=new FileReader();
+    fr.onload=function(){
+      try{
+        var wb=XLSX.read(new Uint8Array(fr.result),{type:'array'});
+        var aoa=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:false,defval:''});
+        $('listInput').value=aoa.filter(function(r){return r.some(function(c){return String(c).trim();});}).map(function(r){return r.slice(0,4).join('\t');}).join('\n');
+        setRows(parseRows(aoa));
+      }catch(e){$('parseMsg').className='msg err';$('parseMsg').textContent='파일을 읽지 못했어요: '+e.message;}
+    };
+    fr.readAsArrayBuffer(f);
+    this.value='';
+  });
+
+  // ----- 디자인 고르기 -----
+  ORDER.forEach(function(k){
+    var d=DESIGNS[k];
+    var b=document.createElement('button');
+    b.type='button';b.setAttribute('data-k',k);
+    b.innerHTML='<img alt="" src="'+d.bg+'"><div>'+d.label+'</div><div style="font-weight:500;font-size:11.5px">'+d.sub+'</div>';
+    b.addEventListener('click',function(){design=k;syncDesign();render();});
+    $('designs').appendChild(b);
+  });
+  function syncDesign(){
+    [].forEach.call(document.querySelectorAll('#designs button'),function(b){b.setAttribute('aria-pressed',b.getAttribute('data-k')===design?'true':'false');});
+    var d=DESIGNS[design];
+    $('grid').style.setProperty('--card',d.card);
+    $('sortRow').classList.toggle('hidden',!d.sortable);
+    $('noteHint').classList.toggle('hidden',design!=='certificate');
+    $('pdfBtn').classList.toggle('hidden',!d.pdf);
+  }
+
+  // ----- 그리기 -----
+  function pageList(){
+    var d=DESIGNS[design];
+    if(d.perPage===1)return rows.map(function(r){return {rows:r,name:[score(r.score),r.school,r.name].join('_')};});
+    var list=rows.slice();
+    if($('sortInput').checked)list.sort(function(a,b){return (parseFloat(b.score)||0)-(parseFloat(a.score)||0);});
+    var out=[];
+    for(var i=0;i<list.length;i+=d.perPage)out.push({rows:list.slice(i,i+d.perPage),name:(out.length+1)+'장'});
+    return out;
+  }
+  function drawPage(canvas,page){
+    var d=DESIGNS[design],exam=$('examInput').value.trim();
+    return Promise.all([loadBg(d.bg),fontsReady]).then(function(r){
+      canvas.width=d.w;canvas.height=d.h;
+      var ctx=canvas.getContext('2d');
+      ctx.drawImage(r[0],0,0,d.w,d.h);
+      d.draw(ctx,page.rows,exam);
+      return canvas;
+    });
+  }
+  function render(){
+    var token=++renderToken,d=DESIGNS[design];
+    pages=pageList();
+    var grid=$('grid');grid.innerHTML='';
+    $('zipBtn').disabled=!pages.length;$('pdfBtn').disabled=!pages.length;
+    $('countText').textContent=pages.length?(d.label+' '+pages.length+'장'):'미리보기';
+    if(!pages.length){
+      grid.innerHTML='<div class="empty">왼쪽에 명단을 붙여넣으면<br>여기에 '+d.label+'이(가) 한 장씩 만들어져요.</div>';
+      return;
+    }
+    pages.forEach(function(p,i){
+      var card=document.createElement('div');card.className='card';
+      var cv=document.createElement('canvas');cv.width=d.w;cv.height=d.h;
+      var meta=document.createElement('div');meta.className='meta';
+      var label=document.createElement('span');label.textContent=(i+1)+'. '+p.name.replace(/_/g,' ');
+      var dl=document.createElement('button');dl.type='button';dl.textContent='저장';
+      dl.addEventListener('click',function(){saveOne(cv,fileName(p,i));});
+      meta.appendChild(label);meta.appendChild(dl);
+      card.appendChild(cv);card.appendChild(meta);grid.appendChild(card);
+      drawPage(cv,p).then(function(){if(token!==renderToken)return;});
+    });
+  }
+  function fileName(p,i){
+    var d=DESIGNS[design],safe=function(s){return String(s).replace(/[\\\/:*?"<>|]/g,'').trim();};
+    return safe(d.file+'_'+(d.perPage===1?p.name:(i+1)+'장'))+'.png';
+  }
+  function blobOf(cv,type,q){return new Promise(function(res){cv.toBlob(res,type||'image/png',q);});}
+  function saveBlob(blob,name){
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1000);
+  }
+  function saveOne(cv,name){blobOf(cv).then(function(b){saveBlob(b,name);});}
+  function busy(btn,on,label){btn.disabled=on;btn.textContent=label;}
+
+  $('zipBtn').addEventListener('click',function(){
+    var btn=this,d=DESIGNS[design],zip=new JSZip(),i=0;
+    busy(btn,true,'만드는 중… 0/'+pages.length);
+    (function next(){
+      if(i>=pages.length){
+        zip.generateAsync({type:'blob'}).then(function(b){
+          saveBlob(b,d.file+'_'+$('examInput').value.trim().replace(/\s+/g,'')+'.zip');
+          busy(btn,false,'전체 다운로드 (ZIP)');toast(pages.length+'장을 ZIP 파일 하나로 저장했어요.');
+        });
+        return;
+      }
+      var cv=document.createElement('canvas'),p=pages[i],name=fileName(p,i);
+      drawPage(cv,p).then(function(){return blobOf(cv);}).then(function(b){zip.file(name,b);i++;btn.textContent='만드는 중… '+i+'/'+pages.length;next();});
+    })();
+  });
+
+  $('pdfBtn').addEventListener('click',function(){
+    var btn=this,d=DESIGNS[design];if(!d.pdf)return;
+    var pdf=new jspdf.jsPDF({unit:'mm',format:[d.pdf.w,d.pdf.h],orientation:'portrait'}),i=0;
+    busy(btn,true,'만드는 중… 0/'+pages.length);
+    (function next(){
+      if(i>=pages.length){
+        pdf.save(d.file+'_'+$('examInput').value.trim().replace(/\s+/g,'')+'.pdf');
+        busy(btn,false,'PDF로 한 번에 (인쇄용)');toast(pages.length+'장을 PDF 한 파일로 저장했어요.');
+        return;
+      }
+      var cv=document.createElement('canvas');
+      drawPage(cv,pages[i]).then(function(){
+        if(i>0)pdf.addPage([d.pdf.w,d.pdf.h],'portrait');
+        pdf.addImage(cv.toDataURL('image/jpeg',.95),'JPEG',0,0,d.pdf.w,d.pdf.h);
+        i++;btn.textContent='만드는 중… '+i+'/'+pages.length;setTimeout(next,0);
+      });
+    })();
+  });
+
+  var toastTimer;
+  function toast(t){var el=$('toast');el.textContent=t;el.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.add('hidden');},3500);}
+
+  syncDesign();render();
+})();
+</script>
+</body>
+</html>
