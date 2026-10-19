@@ -101,6 +101,19 @@
   .field input:focus,.field textarea:focus{outline:2px solid rgba(47,111,237,.35);border-color:var(--blue)}
   .photo{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#f1ece1}
   .photo img{display:block;width:100%;max-height:220px;object-fit:contain;background:#f1ece1}
+  .fitbox{border:1px solid var(--line);border-radius:12px;padding:12px;background:#faf8f3}
+  .fitbox .frame{width:62%;margin:0 auto 12px;border-radius:10px;overflow:hidden;border:2px solid var(--ink);background:#f4efe4;box-shadow:0 6px 16px -10px rgba(0,0,0,.4)}
+  .fitbox .frame img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+  .fitbox .cap{font-size:12.5px;color:var(--muted);text-align:center;margin:-6px 0 12px}
+  .fitrow{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .fitrow > span{width:64px;font-size:13px;font-weight:700;color:var(--muted);flex:none}
+  .opt{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+  .opt button{border:0;background:#fff;padding:7px 12px;font-size:13.5px;font-weight:700;color:var(--muted)}
+  .opt button + button{border-left:1px solid var(--line)}
+  .opt button[aria-pressed="true"]{background:var(--ink);color:#fff}
+  .swatch{width:28px;height:28px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);padding:0}
+  .swatch[aria-pressed="true"]{box-shadow:0 0 0 2px var(--blue)}
+  .fitrow input[type=color]{width:34px;height:30px;border:1px solid var(--line);border-radius:8px;padding:2px;background:#fff}
   .photo .none{padding:30px;text-align:center;color:var(--muted)}
   .photo input{display:none}
   .form-foot{display:flex;justify-content:space-between;gap:8px;margin-top:8px;padding-top:14px;border-top:1px solid var(--line)}
@@ -236,7 +249,8 @@
     ['jungwon.html','중원고 성과'],['grades.html','우수성적 발표'],['classroom.html','상일고 성적 발표'],
     ['jeongsi.html','정시반'],['naesin.html','내신 대비'],['summer.html','지유T 여름특강'],
     ['summer-junior3.html','상학T 중3 여름특강'],['ban-guide.html','개설반 안내'],
-    ['program-mid.html','중등 프로그램'],['program-high.html','고등 프로그램']
+    ['program-mid.html','중등 프로그램'],['program-high.html','고등 프로그램'],
+    ['sangil-midterm.html','상일고1 2학기 중간고사'],['jungwon-midterm.html','중원고1 2학기 중간고사'],['jungheung.html','중흥고 수미T']
   ];
 
   // 섹션마다 편집할 칸
@@ -248,7 +262,8 @@
       sub:function(it){return linkText(it.link);},
       thumb:'image',
       fields:[
-        {key:'image',label:'배너 사진',type:'image',hint:'가로 사진 권장 (약 1024 × 716 비율). 비율이 다르면 가운데 기준으로 잘려요.'},
+        {key:'image',label:'배너 사진',type:'image',hint:'가로 사진 권장 (약 1024 × 716 비율).'},
+        {key:'fit',label:'사진 맞춤',type:'fit',ratio:'1024/716'},
         {key:'alt',label:'사진 설명',type:'text',hint:'사진에 적힌 핵심 문구. 화면엔 안 보이지만 검색·음성 안내에 쓰여요.'},
         {key:'link',label:'누르면 이동할 페이지',type:'link'}
       ],
@@ -262,6 +277,7 @@
       thumb:'image',
       fields:[
         {key:'image',label:'카드 사진',type:'image',hint:'정사각형 사진 권장.'},
+        {key:'fit',label:'사진 맞춤',type:'fit',ratio:'1/1'},
         {key:'category',label:'분류',type:'text',hint:'예) 공지, 학습정보, 성적 발표'},
         {key:'title',label:'제목',type:'text'},
         {key:'link',label:'누르면 이동할 페이지',type:'link',hint:'블로그 글은 「다른 주소 직접 입력」을 고르고 주소를 붙여넣으세요. 새 창으로 열려요.'}
@@ -486,6 +502,8 @@
         if(it[f.key])acts.appendChild(el('a',{href:imgSrc(it[f.key]),download:downloadName(it[f.key],sec.title(it)),text:'사진 다운로드'}));
         pic.appendChild(acts);
         box.appendChild(pic);
+      }else if(f.type==='fit'){
+        box.appendChild(fitEditor(name,it,f.ratio));
       }else if(f.type==='lines'){
         var ta=el('textarea',{});ta.value=(it[f.key]||[]).join('\n');
         ta.addEventListener('input',function(){it[f.key]=ta.value.split('\n').map(function(s){return s.trim();}).filter(Boolean);changed(name);});
@@ -530,6 +548,53 @@
       }}}),
       el('button',{type:'button','class':'btn',text:'완료',on:{click:function(){editing=-1;renderPanel();}}})
     ]));
+  }
+  // 사진 맞춤: 카드·배너 칸 크기는 고정, 사진을 어떻게 넣을지만 고른다
+  var BG_PRESETS=[['#ffffff','흰색'],['#f4efe4','크림'],['#1c1a15','검정'],['#24324a','남색'],['#2c4a3e','초록']];
+  var FIT_POS={top:'center top',center:'center center',bottom:'center bottom'};
+  function fitEditor(name,it,ratio){
+    var wrap=el('div',{'class':'fitbox'});
+    var frame=el('div',{'class':'frame',style:'aspect-ratio:'+ratio});
+    var img=el('img',{alt:''});
+    function paint(){
+      img.src=imgSrc(it.image||'');
+      img.style.objectFit=it.fit==='contain'?'contain':'cover';
+      img.style.objectPosition=FIT_POS[it.pos||'center'];
+      frame.style.background=it.bg||'#f4efe4';
+      colorRow.classList.toggle('hidden',it.fit!=='contain');
+    }
+    function set(key,val,def){ if(!val||val===def)delete it[key]; else it[key]=val; changed(name); paint(); sync(); }
+    function opts(key,list,def){
+      var g=el('div',{'class':'opt'});
+      list.forEach(function(o){
+        g.appendChild(el('button',{type:'button','data-v':o[0],text:o[1],on:{click:function(){set(key,o[0],def);}}}));
+      });
+      return g;
+    }
+    function sync(){
+      [].forEach.call(wrap.querySelectorAll('[data-k]'),function(g){
+        var key=g.getAttribute('data-k'),cur=it[key]||g.getAttribute('data-def');
+        [].forEach.call(g.querySelectorAll('[data-v]'),function(b){b.setAttribute('aria-pressed',b.getAttribute('data-v')===cur?'true':'false');});
+      });
+      picker.value=it.bg||'#f4efe4';
+    }
+    frame.appendChild(img);
+    wrap.appendChild(frame);
+    wrap.appendChild(el('div',{'class':'cap',text:'↑ 홈페이지에 보일 모습 (칸 크기는 고정)'}));
+    var fitG=opts('fit',[['cover','꽉 채우기'],['contain','전체 보이기']],'cover');fitG.setAttribute('data-k','fit');fitG.setAttribute('data-def','cover');
+    var posG=opts('pos',[['top','위'],['center','가운데'],['bottom','아래']],'center');posG.setAttribute('data-k','pos');posG.setAttribute('data-def','center');
+    wrap.appendChild(el('div',{'class':'fitrow'},[el('span',{text:'맞춤'}),fitG]));
+    wrap.appendChild(el('div',{'class':'fitrow'},[el('span',{text:'기준 위치'}),posG]));
+    var sw=el('div',{'class':'fitrow','data-k':'bg','data-def':'#f4efe4'},[el('span',{text:'여백 색'})]);
+    BG_PRESETS.forEach(function(c){sw.appendChild(el('button',{type:'button','class':'swatch','data-v':c[0],title:c[1],style:'background:'+c[0],on:{click:function(){set('bg',c[0],'');}}}));});
+    var picker=el('input',{type:'color',title:'직접 고르기'});
+    picker.addEventListener('input',function(){set('bg',picker.value,'');});
+    sw.appendChild(picker);
+    var colorRow=sw;
+    wrap.appendChild(sw);
+    wrap.appendChild(el('span',{'class':'hint',text:'꽉 채우기: 칸을 사진으로 가득 채우고 넘치는 부분은 잘려요. 전체 보이기: 사진이 다 보이고 남는 곳은 「여백 색」으로 채워요.'}));
+    paint();sync();
+    return wrap;
   }
   function linkText(link){
     if(!link)return '누르면 이동 안 함';

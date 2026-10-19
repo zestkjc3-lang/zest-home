@@ -161,7 +161,15 @@
 
   /* programs */
   .prog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-  .blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:760px;margin:0 auto}
+  /* 공지·블로그 카드: 3개씩 2줄(최대 6개)이 한 화면에 들어오게. 사진은 어떤 비율이든 정사각형 칸에 꽉 채운다 */
+  .post{display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--line);border-radius:20px;overflow:hidden;color:inherit;text-decoration:none;transition:.22s}
+  .post:hover{transform:translateY(-3px);box-shadow:0 20px 44px -28px rgba(28,26,21,.3)}
+  .post .ph-img{position:relative;aspect-ratio:1/1;overflow:hidden;background:#f4efe4}
+  .post .ph-img img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+  .post-body{padding:12px 16px 14px}
+  .post-cat{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.05em}
+  .post-title{font-size:16px;font-weight:700;margin:4px 0 0;color:var(--ink);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .prog{background:var(--paper);border-radius:26px;overflow:hidden;border:1px solid var(--line);transition:.22s;display:block;color:inherit}
   .prog:hover{transform:translateY(-4px);box-shadow:0 26px 60px -30px rgba(28,26,21,.28);border-color:var(--line-2)}
   .prog .ph-img{position:relative}
@@ -328,7 +336,12 @@
     .brand .mark{width:22px;height:26px}
     .brand small{display:none}
     .feat-grid{grid-template-columns:repeat(2,1fr)}
-    .prog-grid,.blog-grid,.foot-grid{grid-template-columns:1fr}
+    .prog-grid,.foot-grid{grid-template-columns:1fr}
+    .blog-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+    .post{border-radius:14px}
+    .post-body{padding:10px 12px 12px}
+    .post-title{font-size:14.5px;margin:3px 0 0}
+    .post-cat{font-size:11px}
     .row-head{flex-direction:column;align-items:flex-start;gap:18px}
     .float a .lbl{display:none}
     .float a{padding:14px;justify-content:center}
@@ -736,6 +749,15 @@
   }
   // CMS는 사진 경로를 /images/... 로 저장한다 → 페이지 기준 상대 경로로 바꾼다
   function asset(p){return String(p||'').replace(/^\//,'');}
+  // 편집 화면의 「사진 맞춤」 설정: fit(cover|contain) · pos(top|center|bottom) · bg(여백 배경색)
+  var FIT_POS={top:'center top',center:'center center',bottom:'center bottom'};
+  function fitStyle(it){
+    var st='';
+    if(it.fit==='contain')st+='object-fit:contain;';
+    if(it.pos&&FIT_POS[it.pos])st+='object-position:'+FIT_POS[it.pos]+';';
+    return st;
+  }
+  function safeColor(c){return /^#[0-9a-fA-F]{3,8}$/.test(c||'')?c:'';}
   function loadData(name,cb){
     fetch('data/'+name+'.json',{cache:'no-cache'})
       .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
@@ -781,12 +803,10 @@
       a.setAttribute('data-edit','posts:'+k);
       a.href=p.link||'#blog';
       if(/^https?:/.test(p.link||'')){a.target='_blank';a.rel='noopener';}
-      a.style.cssText='background:var(--paper);border:1px solid var(--line);border-radius:24px;overflow:hidden';
       a.innerHTML=
-        '<div class="ph-img sharp"><img src="'+esc(asset(p.image))+'" alt="'+esc(p.alt||p.title)+'" onerror="this.removeAttribute(\'src\')"/><div class="label">📷<small>블로그 이미지</small></div></div>'+
-        '<div style="padding:22px 24px 26px"><span style="font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.05em">'+esc(p.category)+'</span>'+
-        '<h3 style="font-size:18px;font-weight:700;margin:9px 0 14px;color:var(--ink);line-height:1.45">'+esc(p.title)+'</h3>'+
-        '<p style="font-size:14px;color:var(--muted-2);font-weight:600">자세히 보기 →</p></div>';
+        '<div class="ph-img"'+(safeColor(p.bg)?' style="background:'+safeColor(p.bg)+'"':'')+'><img src="'+esc(asset(p.image))+'" alt="'+esc(p.alt||p.title)+'" style="'+fitStyle(p)+'" onerror="this.removeAttribute(\'src\')"/><div class="label">📷<small>블로그 이미지</small></div></div>'+
+        '<div class="post-body"><span class="post-cat">'+esc(p.category)+'</span>'+
+        '<h3 class="post-title">'+esc(p.title)+'</h3></div>';
       grid.appendChild(a);
       if(window.observeReveal)window.observeReveal(a);
     });
@@ -944,6 +964,8 @@
         var img=document.createElement('img');
         img.src=asset(it.image);
         img.alt=it.alt||'';
+        img.style.cssText=fitStyle(it);
+        if(safeColor(it.bg))fig.style.background=safeColor(it.bg);
         var wrap=fig;
         if(it.link){
           var a=document.createElement('a');
@@ -1003,7 +1025,7 @@
       '[data-edit]::after{content:"✏️ 눌러서 수정";position:absolute;top:10px;left:10px;z-index:5;background:#2f6fed;color:#fff;font-size:13px;font-weight:700;padding:5px 10px;border-radius:999px;pointer-events:none;opacity:0;transition:opacity .15s}'+
       '[data-edit]:hover::after,[data-edit].zest-selected::after{opacity:1}'+
       '[data-edit].zest-selected{outline:3px solid #f08c00;outline-offset:3px}'+
-      '.post-add{min-height:320px;border:3px dashed #c9bfa6;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#8a8170;cursor:pointer;background:rgba(255,255,255,.5)}'+
+      '.post-add{min-height:220px;border:3px dashed #c9bfa6;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#8a8170;cursor:pointer;background:rgba(255,255,255,.5)}'+
       '.post-add span{font-size:40px;line-height:1}.post-add b{font-size:16px}'+
       '.post-add:hover{border-color:#2f6fed;color:#2f6fed;background:#f5f8ff}'+
       '.reveal{opacity:1!important;transform:none!important}';

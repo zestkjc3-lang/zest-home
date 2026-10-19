@@ -20,6 +20,28 @@
       "image": "/images/grades-sangil-cover.png",
       "alt": "상일고1 1학기 전교 1·3등 배출 — 제스트에듀",
       "link": "classroom.html"
+    },
+    {
+      "category": "성적 발표",
+      "title": "상일고1 2학기 중간고사, 2→1등급 상승!",
+      "image": "/images/sangil-midterm-card.jpg",
+      "alt": "상일고1 2학기 중간고사 영어 시험 분석 — 1등급 컷 85±2점 예측, 김상학T",
+      "link": "sangil-midterm.html",
+      "pos": "top"
+    },
+    {
+      "category": "성적 발표",
+      "title": "중원고1 영어 99점 4명 · 21점 상승",
+      "image": "/images/jungwon-midterm-result.jpg",
+      "alt": "2026학년도 2학기 중간고사 중원고 1학년 영어 — 99점 4명, 90점 이상 9명, 21점 상승, 제스트에듀 지유T",
+      "link": "jungwon-midterm.html"
+    },
+    {
+      "category": "학습정보",
+      "title": "중흥고 영어에 진심! 수미T의 7가지 원칙",
+      "image": "/images/blog6-jungheung.jpg",
+      "alt": "중흥고 영어에 진심! 중하위권 학생을 상위권으로, 상위권 학생은 최상위권으로! — 수미T 7가지 원칙: 누구도 소외되지 않게, 단어는 고반복, 지문은 최소 3회독, 문제풀이는 오답이 생명, 수준에 맞는 학습, 안 되면 될 때까지, 가장 중요한 것은 학생의 긍정적인 변화. 제스트에듀 수미T",
+      "link": "jungheung.html"
     }
   ]
 }
