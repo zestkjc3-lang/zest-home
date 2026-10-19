@@ -114,6 +114,13 @@
   .swatch{width:28px;height:28px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);padding:0}
   .swatch[aria-pressed="true"]{box-shadow:0 0 0 2px var(--blue)}
   .fitrow input[type=color]{width:34px;height:30px;border:1px solid var(--line);border-radius:8px;padding:2px;background:#fff}
+  .fitbox .frame.drag{cursor:grab;touch-action:none;user-select:none}
+  .fitbox .frame.dragging{cursor:grabbing;outline:3px solid var(--blue);outline-offset:2px}
+  .fitbox .frame img{pointer-events:none}
+  .fitrow input[type=range]{flex:1;min-width:120px;accent-color:var(--ink)}
+  .fitrow .val{width:48px;text-align:right;font-size:13px;color:var(--ink)}
+  .fitbox .warn{color:var(--red);margin:6px 0 0}
+  .fitbox .reset{padding:7px 12px;font-size:13.5px}
   .photo .none{padding:30px;text-align:center;color:var(--muted)}
   .photo input{display:none}
   .form-foot{display:flex;justify-content:space-between;gap:8px;margin-top:8px;padding-top:14px;border-top:1px solid var(--line)}
@@ -550,50 +557,98 @@
     ]));
   }
   // 사진 맞춤: 카드·배너 칸 크기는 고정, 사진을 어떻게 넣을지만 고른다
+  // 홈페이지 index.html 의 fitStyle 과 같은 규칙으로 그린다
   var BG_PRESETS=[['#ffffff','흰색'],['#f4efe4','크림'],['#1c1a15','검정'],['#24324a','남색'],['#2c4a3e','초록']];
-  var FIT_POS={top:'center top',center:'center center',bottom:'center bottom'};
+  var FIT_POS_Y={top:0,center:50,bottom:100};
+  function num(v,def,min,max){v=parseFloat(v);return isFinite(v)?Math.min(max,Math.max(min,v)):def;}
+  function fitVals(it){
+    return {x:num(it.x,50,0,100), y:num(it.y,it.pos in FIT_POS_Y?FIT_POS_Y[it.pos]:50,0,100),
+            z:num(it.zoom,1,0.5,3), sx:num(it.sx,1,0.5,2), sy:num(it.sy,1,0.5,2)};
+  }
+  function applyFit(img,frame,it){
+    var v=fitVals(it);
+    img.style.objectFit=it.fit==='contain'?'contain':'cover';
+    img.style.objectPosition=v.x+'% '+v.y+'%';
+    img.style.transformOrigin=v.x+'% '+v.y+'%';
+    img.style.transform='scale('+(v.z*v.sx)+','+(v.z*v.sy)+')';
+    frame.style.background=it.bg||'#f4efe4';
+  }
   function fitEditor(name,it,ratio){
     var wrap=el('div',{'class':'fitbox'});
-    var frame=el('div',{'class':'frame',style:'aspect-ratio:'+ratio});
-    var img=el('img',{alt:''});
+    var frame=el('div',{'class':'frame drag',style:'aspect-ratio:'+ratio,title:'끌어서 위치 맞추기'});
+    var img=el('img',{alt:'',draggable:'false'});
+    img.src=imgSrc(it.image||'');
+    frame.appendChild(img);
+    wrap.appendChild(frame);
+    wrap.appendChild(el('div',{'class':'cap',text:'↑ 홈페이지에 보일 모습 · 사진을 끌어서 위치를 맞추세요'}));
+
+    function save(key,val,def){
+      if(val===def||val===''||val==null)delete it[key]; else it[key]=val;
+      if(key==='y')delete it.pos;
+    }
+    function done(){changed(name);paint();}
     function paint(){
-      img.src=imgSrc(it.image||'');
-      img.style.objectFit=it.fit==='contain'?'contain':'cover';
-      img.style.objectPosition=FIT_POS[it.pos||'center'];
-      frame.style.background=it.bg||'#f4efe4';
-      colorRow.classList.toggle('hidden',it.fit!=='contain');
-    }
-    function set(key,val,def){ if(!val||val===def)delete it[key]; else it[key]=val; changed(name); paint(); sync(); }
-    function opts(key,list,def){
-      var g=el('div',{'class':'opt'});
-      list.forEach(function(o){
-        g.appendChild(el('button',{type:'button','data-v':o[0],text:o[1],on:{click:function(){set(key,o[0],def);}}}));
-      });
-      return g;
-    }
-    function sync(){
+      applyFit(img,frame,it);
+      var v=fitVals(it);
       [].forEach.call(wrap.querySelectorAll('[data-k]'),function(g){
         var key=g.getAttribute('data-k'),cur=it[key]||g.getAttribute('data-def');
         [].forEach.call(g.querySelectorAll('[data-v]'),function(b){b.setAttribute('aria-pressed',b.getAttribute('data-v')===cur?'true':'false');});
       });
+      zoomR.value=Math.round(v.z*100);zoomL.textContent=zoomR.value+'%';
+      sxR.value=Math.round(v.sx*100);sxL.textContent=sxR.value+'%';
+      syR.value=Math.round(v.sy*100);syL.textContent=syR.value+'%';
+      warn.classList.toggle('hidden',v.sx===1&&v.sy===1);
       picker.value=it.bg||'#f4efe4';
     }
-    frame.appendChild(img);
-    wrap.appendChild(frame);
-    wrap.appendChild(el('div',{'class':'cap',text:'↑ 홈페이지에 보일 모습 (칸 크기는 고정)'}));
-    var fitG=opts('fit',[['cover','꽉 채우기'],['contain','전체 보이기']],'cover');fitG.setAttribute('data-k','fit');fitG.setAttribute('data-def','cover');
-    var posG=opts('pos',[['top','위'],['center','가운데'],['bottom','아래']],'center');posG.setAttribute('data-k','pos');posG.setAttribute('data-def','center');
-    wrap.appendChild(el('div',{'class':'fitrow'},[el('span',{text:'맞춤'}),fitG]));
-    wrap.appendChild(el('div',{'class':'fitrow'},[el('span',{text:'기준 위치'}),posG]));
+
+    // 끌어서 위치 맞추기: 사진을 오른쪽으로 끌면 왼쪽 부분이 보인다
+    frame.addEventListener('pointerdown',function(e){
+      if(!it.image)return;
+      e.preventDefault();frame.setPointerCapture(e.pointerId);frame.classList.add('dragging');
+      var start=fitVals(it),sx0=e.clientX,sy0=e.clientY,r=frame.getBoundingClientRect();
+      function move(ev){
+        var k=150/Math.max(1,start.z);
+        save('x',Math.round(Math.min(100,Math.max(0,start.x-(ev.clientX-sx0)/r.width*k))),50);
+        save('y',Math.round(Math.min(100,Math.max(0,start.y-(ev.clientY-sy0)/r.height*k))),50);
+        applyFit(img,frame,it);
+      }
+      function up(){frame.removeEventListener('pointermove',move);frame.removeEventListener('pointerup',up);frame.removeEventListener('pointercancel',up);frame.classList.remove('dragging');done();}
+      frame.addEventListener('pointermove',move);frame.addEventListener('pointerup',up);frame.addEventListener('pointercancel',up);
+    });
+
+    function opts(key,list,def){
+      var g=el('div',{'class':'opt','data-k':key,'data-def':def});
+      list.forEach(function(o){g.appendChild(el('button',{type:'button','data-v':o[0],text:o[1],on:{click:function(){save(key,o[0],def);done();}}}));});
+      return g;
+    }
+    function slider(min,max,on){
+      var r=el('input',{type:'range',min:min,max:max,step:'1'}),l=el('b',{'class':'val'});
+      r.addEventListener('input',function(){on(+r.value/100);l.textContent=r.value+'%';changed(name);applyFit(img,frame,it);});
+      r.addEventListener('change',paint);
+      return [r,l];
+    }
+    var z=slider(100,300,function(v){save('zoom',v,1);}),zoomR=z[0],zoomL=z[1];
+    var x=slider(50,200,function(v){save('sx',v,1);}),sxR=x[0],sxL=x[1];
+    var y=slider(50,200,function(v){save('sy',v,1);}),syR=y[0],syL=y[1];
+
+    wrap.appendChild(el('div',{'class':'fitrow'},[el('span',{text:'맞춤'}),opts('fit',[['cover','꽉 채우기'],['contain','전체 보이기']],'cover')]));
+    wrap.appendChild(el('div',{'class':'fitrow'},[el('span',{text:'확대'}),zoomR,zoomL]));
+    wrap.appendChild(el('div',{'class':'fitrow'},[el('span',{text:'가로 늘리기'}),sxR,sxL]));
+    wrap.appendChild(el('div',{'class':'fitrow'},[el('span',{text:'세로 늘리기'}),syR,syL]));
+    var warn=el('div',{'class':'hint warn',text:'⚠ 가로·세로를 따로 늘리면 사진 속 글자와 얼굴이 찌그러질 수 있어요.'});
+    wrap.appendChild(warn);
     var sw=el('div',{'class':'fitrow','data-k':'bg','data-def':'#f4efe4'},[el('span',{text:'여백 색'})]);
-    BG_PRESETS.forEach(function(c){sw.appendChild(el('button',{type:'button','class':'swatch','data-v':c[0],title:c[1],style:'background:'+c[0],on:{click:function(){set('bg',c[0],'');}}}));});
+    BG_PRESETS.forEach(function(c){sw.appendChild(el('button',{type:'button','class':'swatch','data-v':c[0],title:c[1],style:'background:'+c[0],on:{click:function(){save('bg',c[0],'');done();}}}));});
     var picker=el('input',{type:'color',title:'직접 고르기'});
-    picker.addEventListener('input',function(){set('bg',picker.value,'');});
+    picker.addEventListener('input',function(){save('bg',picker.value,'');changed(name);applyFit(img,frame,it);});
     sw.appendChild(picker);
-    var colorRow=sw;
     wrap.appendChild(sw);
-    wrap.appendChild(el('span',{'class':'hint',text:'꽉 채우기: 칸을 사진으로 가득 채우고 넘치는 부분은 잘려요. 전체 보이기: 사진이 다 보이고 남는 곳은 「여백 색」으로 채워요.'}));
-    paint();sync();
+    wrap.appendChild(el('div',{'class':'fitrow'},[el('span',{}),
+      el('button',{type:'button','class':'btn reset',text:'↺ 처음 상태로',on:{click:function(){
+        ['fit','pos','x','y','zoom','sx','sy','bg'].forEach(function(k){delete it[k];});done();
+      }}})]));
+    wrap.appendChild(el('span',{'class':'hint',text:'꽉 채우기: 칸을 가득 채우고 넘치는 부분은 잘려요. 전체 보이기: 사진이 다 보이고 남는 곳은 「여백 색」으로 채워요. 사진을 끌거나 확대해서 보이는 부분을 맞출 수 있어요.'}));
+    paint();
     return wrap;
   }
   function linkText(link){
