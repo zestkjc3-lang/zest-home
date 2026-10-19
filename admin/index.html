@@ -1,13 +1,669 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="robots" content="noindex, nofollow" />
-  <title>제스트에듀 관리자</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>제스트에듀 홈페이지 편집</title>
+<link rel="icon" href="/favicon.ico?v=2" sizes="any" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root{--ink:#1c1a15;--muted:#6b6558;--line:#e3ddcf;--bg:#f6f3ec;--paper:#fff;--gold:#b99a57;--blue:#2f6fed;--red:#d9480f;--green:#2b8a3e}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:Pretendard,system-ui,sans-serif;color:var(--ink);background:var(--bg);font-size:15px}
+  button,input,textarea{font:inherit;color:inherit}
+  button{cursor:pointer}
+  .hidden{display:none!important}
+
+  /* 로그인 */
+  .login{min-height:100%;display:grid;place-items:center;padding:24px 16px}
+  .login-box{width:100%;max-width:440px;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:32px 28px;box-shadow:0 20px 50px -30px rgba(0,0,0,.3)}
+  .login-box h1{margin:0 0 6px;font-size:22px}
+  .login-box p{margin:0 0 20px;color:var(--muted);line-height:1.6}
+  .login-box label{display:block;font-weight:700;margin-bottom:8px}
+  .login-box input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px}
+  .login-box .remember{display:flex;gap:8px;align-items:center;font-weight:500;margin:12px 0 18px;color:var(--muted)}
+  .login-box .remember input{width:auto}
+  .btn{border:1px solid var(--line);background:var(--paper);padding:10px 16px;border-radius:10px;font-weight:700}
+  .btn:hover{border-color:#cbbf9f}
+  .btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn-primary:hover{background:#2459c9;border-color:#2459c9}
+  .btn-primary:disabled{background:#a9bde9;border-color:#a9bde9;cursor:default}
+  .btn-danger{color:var(--red)}
+  .btn-block{width:100%;padding:13px}
+  .msg{margin-top:12px;font-size:14px;line-height:1.5}
+  .msg.err{color:var(--red)}
+  details{margin-top:20px;color:var(--muted);font-size:14px;line-height:1.7}
+  details summary{cursor:pointer;font-weight:700;color:var(--ink)}
+  details ol{padding-left:20px;margin:8px 0 0}
+
+  /* 편집 화면 */
+  .app{height:100%;display:grid;grid-template-rows:auto 1fr}
+  .topbar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--paper);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .topbar h1{font-size:17px;margin:0 8px 0 0}
+  .topbar .who{color:var(--muted);font-size:13px}
+  .topbar .spacer{flex:1}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{border:0;background:var(--paper);padding:8px 12px;font-weight:600;color:var(--muted)}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+  .dirty{font-size:14px;font-weight:800;color:var(--red)}
+  #saveBtn:not(:disabled){background:var(--green);border-color:var(--green);padding:10px 22px;font-size:16px}
+  .main{display:grid;grid-template-columns:minmax(0,1fr) 400px;min-height:0;min-width:0}
+  .preview{padding:16px;min-height:0;display:flex;justify-content:center;background:#e9e4d8}
+  .frame-wrap{width:100%;height:100%;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px -18px rgba(0,0,0,.4);transition:width .2s}
+  .frame-wrap.mobile{width:390px}
+  .frame-wrap iframe{width:100%;height:100%;border:0;display:block}
+  .panel{background:var(--paper);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+  .tabs{display:flex;border-bottom:1px solid var(--line)}
+  .tabs button{flex:1;border:0;background:none;padding:14px 6px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent}
+  .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--gold)}
+  .panel-body{flex:1;overflow:auto;padding:16px}
+  .tip{background:#eef3ff;color:#244a9c;border-radius:12px;padding:12px 14px;font-size:14.5px;line-height:1.7;margin-bottom:14px}
+  .tip ol{margin:0;padding-left:20px}
+  .tip b{color:#163a85}
+  .item{display:flex;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:var(--paper)}
+  .item:hover{border-color:#cbbf9f}
+  .item.on{border-color:var(--blue);box-shadow:0 0 0 2px rgba(47,111,237,.15)}
+  .item img{width:72px;height:52px;object-fit:cover;border-radius:8px;background:#f1ece1;flex:none}
+  .item .t{flex:1;min-width:0;cursor:pointer}
+  .item .t b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .item .t small{color:var(--muted)}
+  .item .ctl{display:flex;gap:4px}
+  .item .ctl{flex-direction:column;gap:4px}
+  .item .ctl button{border:1px solid var(--line);background:var(--paper);border-radius:8px;height:30px;padding:0 10px;font-size:13px;font-weight:700;white-space:nowrap}
+  .item .edit-btn{color:var(--blue)}
+  .field select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .field .sub-input{margin-top:8px}
+  .item .grip{flex:none;width:26px;align-self:stretch;display:grid;place-items:center;color:#a39b88;font-size:18px;cursor:grab;touch-action:none;user-select:none;border-radius:8px}
+  .item .grip:hover{background:#f3efe6;color:var(--ink)}
+  .item.dragging{opacity:.9;box-shadow:0 14px 30px -12px rgba(0,0,0,.35);border-color:var(--blue);position:relative;z-index:3;background:#f5f8ff}
+  body.is-dragging{cursor:grabbing;user-select:none}
+  .item .ctl .del{color:var(--red)}
+  .photo .acts{display:flex;border-top:1px solid var(--line)}
+  .photo .acts > *{flex:1;display:block;text-align:center;padding:10px;background:var(--paper);font-weight:700;color:var(--blue);cursor:pointer;text-decoration:none;border:0;font-size:14px}
+  .photo .acts > * + *{border-left:1px solid var(--line)}
+  .modal{position:fixed;inset:0;background:rgba(20,18,14,.45);display:grid;place-items:center;padding:16px;z-index:40}
+  .modal-box{background:var(--paper);border-radius:18px;max-width:560px;width:100%;max-height:calc(100vh - 32px);overflow:auto;padding:26px 26px 22px}
+  .modal-box h2{margin:0 0 14px;font-size:20px}
+  .modal-box h3{margin:20px 0 8px;font-size:16px}
+  .modal-box ol,.modal-box ul{margin:0;padding-left:20px;line-height:1.75}
+  .modal-box .note{background:#fff8e6;border-radius:10px;padding:10px 12px;margin-top:18px;font-size:14px;line-height:1.6}
+  .modal-box .close{margin-top:18px;width:100%}
+  .add{width:100%;border:2px dashed var(--line);background:none;border-radius:12px;padding:12px;font-weight:700;color:var(--muted);margin-top:4px}
+  .add:hover{border-color:var(--gold);color:var(--ink)}
+  .back{border:0;background:none;padding:0 0 12px;font-weight:700;color:var(--blue)}
+  .field{margin-bottom:16px}
+  .field > label{display:block;font-weight:700;margin-bottom:6px}
+  .field .hint{display:block;font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.5}
+  .field input[type=text],.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .field textarea{min-height:96px;resize:vertical;line-height:1.5}
+  .field input:focus,.field textarea:focus{outline:2px solid rgba(47,111,237,.35);border-color:var(--blue)}
+  .photo{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#f1ece1}
+  .photo img{display:block;width:100%;max-height:220px;object-fit:contain;background:#f1ece1}
+  .photo .none{padding:30px;text-align:center;color:var(--muted)}
+  .photo input{display:none}
+  .form-foot{display:flex;justify-content:space-between;gap:8px;margin-top:8px;padding-top:14px;border-top:1px solid var(--line)}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;z-index:50;max-width:calc(100% - 32px);box-shadow:0 12px 30px -12px rgba(0,0,0,.5)}
+  .toast.err{background:var(--red)}
+  .toast.ok{background:var(--green)}
+
+  @media (max-width:900px){
+    body{overflow-x:hidden}
+    .app{height:auto;min-height:100%}
+    .topbar{position:sticky;top:0;z-index:10;gap:8px;padding:8px 12px}
+    .topbar h1{font-size:16px;margin:0}
+    .topbar .who,.seg-device,.topbar .spacer{display:none}
+    .topbar .btn{padding:8px 11px;font-size:14px}
+    #saveBtn:not(:disabled){padding:8px 14px;font-size:15px}
+    .topbar h1{flex:1 0 100%}
+    .dirty{flex:1 0 100%;order:9}
+    .main{grid-template-columns:minmax(0,1fr);grid-template-rows:60vh auto}
+    .panel{border-left:0;border-top:1px solid var(--line)}
+    .panel-body{overflow:visible}
+    .preview{padding:8px}
+  }
+</style>
 </head>
 <body>
-  <!-- Sveltia CMS: 버전을 고정해 두어 CDN 쪽 변경이 바로 들어오지 않게 한다. 올릴 때는 버전 숫자만 바꾼다. -->
-  <script src="https://unpkg.com/@sveltia/cms@0.229.0/dist/sveltia-cms.js"></script>
+
+<!-- 1. 로그인 -->
+<section class="login" id="loginView">
+  <div class="login-box">
+    <h1>홈페이지 편집</h1>
+    <p>메인 배너 · 공지 카드 · 강사진을 홈페이지 화면을 보면서 바로 고칠 수 있어요.<br>처음 한 번만 아래 칸에 <b>토큰(비밀번호 같은 글자)</b>을 붙여넣으면 돼요.</p>
+    <form id="loginForm">
+      <label for="tokenInput">GitHub 토큰</label>
+      <input id="tokenInput" type="password" autocomplete="off" placeholder="github_pat_로 시작하는 문자열" required />
+      <label class="remember"><input type="checkbox" id="rememberInput" checked /> 이 컴퓨터에서 로그인 유지</label>
+      <button class="btn btn-primary btn-block" type="submit" id="loginBtn">로그인</button>
+      <div class="msg" id="loginMsg"></div>
+    </form>
+    <details>
+      <summary>토큰은 어떻게 만드나요?</summary>
+      <ol>
+        <li>GitHub 로그인 → 오른쪽 위 프로필 → Settings</li>
+        <li>맨 아래 Developer settings → Personal access tokens → Fine-grained tokens → Generate new token</li>
+        <li>Repository access: Only select repositories → <b>zest-home</b></li>
+        <li>Permissions → Contents: <b>Read and write</b> (나머지는 그대로)</li>
+        <li>만들어진 토큰을 복사해 위 칸에 붙여넣기</li>
+      </ol>
+      공용 컴퓨터에서는 「로그인 유지」를 끄고 쓰세요.
+    </details>
+  </div>
+</section>
+
+<!-- 2. 편집 화면 -->
+<div class="app hidden" id="appView">
+  <header class="topbar">
+    <h1>홈페이지 편집</h1>
+    <span class="who" id="whoText"></span>
+    <span class="spacer"></span>
+    <div class="seg seg-device" role="group" aria-label="미리보기 크기">
+      <button type="button" data-device="pc" aria-pressed="true">PC</button>
+      <button type="button" data-device="mobile" aria-pressed="false">휴대폰</button>
+    </div>
+    <span class="dirty hidden" id="dirtyText"></span>
+    <button class="btn hidden" type="button" id="discardBtn">되돌리기</button>
+    <button class="btn btn-primary" type="button" id="saveBtn" disabled>저장하기</button>
+    <button class="btn" type="button" id="helpBtn">사용법</button>
+    <button class="btn" type="button" id="logoutBtn">로그아웃</button>
+  </header>
+  <div class="main">
+    <div class="preview">
+      <div class="frame-wrap" id="frameWrap">
+        <iframe id="frame" title="홈페이지 미리보기"></iframe>
+      </div>
+    </div>
+    <aside class="panel">
+      <nav class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="banners" aria-selected="true">메인 배너</button>
+        <button type="button" role="tab" data-tab="posts" aria-selected="false">공지 카드</button>
+        <button type="button" role="tab" data-tab="teachers" aria-selected="false">강사진</button>
+      </nav>
+      <div class="panel-body" id="panelBody"></div>
+    </aside>
+  </div>
+</div>
+
+<div class="modal hidden" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="modal-box">
+    <h2 id="helpTitle">사용법</h2>
+    <p style="margin:0;color:var(--muted);line-height:1.6">홈페이지 미리보기와 수정 칸이 함께 보여요. 고친 내용은 미리보기에 바로 보이고, <b>「저장하기」를 눌러야</b> 실제 홈페이지에 올라가요.</p>
+
+    <h3>✏️ 고치기</h3>
+    <ol>
+      <li>홈페이지 화면(미리보기)에서 바꾸고 싶은 <b>배너 · 공지 카드 · 강사 카드</b>를 누르세요. 오른쪽 목록의 「✏️ 수정」을 눌러도 돼요.</li>
+      <li>오른쪽에 수정 칸이 열려요. 글자를 고치면 미리보기에 바로 반영돼요.</li>
+      <li>다 고쳤으면 오른쪽 위 초록색 <b>「저장하기」</b>를 누르세요. 1~2분 뒤 홈페이지에 반영돼요.</li>
+    </ol>
+
+    <h3>🖼 사진 바꾸기 · 내려받기</h3>
+    <ul>
+      <li><b>사진 바꾸기</b>: 컴퓨터나 휴대폰에서 새 사진을 고르면 끝이에요. 너무 큰 사진은 자동으로 알맞게 줄여요.</li>
+      <li><b>사진 다운로드</b>: 지금 걸려 있는 사진을 내 컴퓨터에 저장해요. 수정 전 원본을 보관할 때 쓰세요.</li>
+      <li>배너는 <b>가로 사진(약 1024 × 716)</b>, 공지 카드는 <b>정사각형</b>, 강사는 <b>세로 사진</b>이 잘 맞아요.</li>
+    </ul>
+
+    <h3>↕️ 순서 바꾸기</h3>
+    <ul>
+      <li>오른쪽 목록에서 왼쪽 <b>⠿ 손잡이를 잡고 위아래로 끌어다 놓으세요.</b></li>
+      <li>맨 위에 있는 것이 홈페이지에서도 첫 번째로 보여요.</li>
+    </ul>
+
+    <h3>➕ 추가 · 🗑 삭제</h3>
+    <ul>
+      <li>목록 맨 아래 「+ 새 ○○ 추가」를 누르고 사진과 글을 넣으세요.</li>
+      <li>지우려면 목록의 「🗑 삭제」를 누르세요.</li>
+    </ul>
+
+    <div class="note">
+      <b>실수했어요!</b> → 저장하기 전이면 위의 <b>「되돌리기」</b>를 누르면 처음 상태로 돌아가요.<br>
+      저장 후에는 1~2분 뒤 홈페이지에 반영돼요. 저장한 뒤 잘못된 걸 알았다면 같은 방법으로 다시 고쳐서 저장하면 돼요.
+    </div>
+    <button class="btn btn-primary close" type="button" id="helpClose">알겠어요</button>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+
+<script>
+(function(){
+  var REPO='zestkjc3-lang/zest-home', BRANCH='main', API='https://api.github.com/repos/'+REPO;
+  var TOKEN_KEY='zest-admin-token';
+  var PAGES=[
+    ['jungwon.html','중원고 성과'],['grades.html','우수성적 발표'],['classroom.html','상일고 성적 발표'],
+    ['jeongsi.html','정시반'],['naesin.html','내신 대비'],['summer.html','지유T 여름특강'],
+    ['summer-junior3.html','상학T 중3 여름특강'],['ban-guide.html','개설반 안내'],
+    ['program-mid.html','중등 프로그램'],['program-high.html','고등 프로그램']
+  ];
+
+  // 섹션마다 편집할 칸
+  var SECTIONS={
+    banners:{label:'배너',file:'data/banners.json',
+      required:[['image','배너 사진']],
+      tip:'순서는 ⠿ 손잡이를 잡고 위아래로 끌면 바뀌어요. 맨 위가 첫 번째 배너예요.',
+      title:function(it){return it.alt||'(설명 없음)';},
+      sub:function(it){return linkText(it.link);},
+      thumb:'image',
+      fields:[
+        {key:'image',label:'배너 사진',type:'image',hint:'가로 사진 권장 (약 1024 × 716 비율). 비율이 다르면 가운데 기준으로 잘려요.'},
+        {key:'alt',label:'사진 설명',type:'text',hint:'사진에 적힌 핵심 문구. 화면엔 안 보이지만 검색·음성 안내에 쓰여요.'},
+        {key:'link',label:'누르면 이동할 페이지',type:'link'}
+      ],
+      blank:function(){return {image:'',alt:'',link:'',label:''};}
+    },
+    posts:{label:'카드',file:'data/posts.json',max:6,
+      required:[['image','카드 사진'],['title','제목']],
+      tip:'홈페이지 「공지 · 블로그」 칸의 카드예요. 한 줄에 3개씩, 최대 6개까지 넣을 수 있어요. ⠿ 손잡이를 끌어서 순서를 바꿔요.',
+      title:function(it){return it.title||'(제목 없음)';},
+      sub:function(it){return (it.category?'['+it.category+'] ':'')+linkText(it.link);},
+      thumb:'image',
+      fields:[
+        {key:'image',label:'카드 사진',type:'image',hint:'정사각형 사진 권장.'},
+        {key:'category',label:'분류',type:'text',hint:'예) 공지, 학습정보, 성적 발표'},
+        {key:'title',label:'제목',type:'text'},
+        {key:'link',label:'누르면 이동할 페이지',type:'link',hint:'블로그 글은 「다른 주소 직접 입력」을 고르고 주소를 붙여넣으세요. 새 창으로 열려요.'}
+      ],
+      blank:function(){return {category:'공지',title:'',image:'',alt:'',link:''};}
+    },
+    teachers:{label:'강사',file:'data/teachers.json',
+      required:[['name','이름'],['photo','프로필 사진']],
+      tip:'강사 카드와 눌렀을 때 뜨는 프로필 창 내용까지 고칠 수 있어요. ⠿ 손잡이로 순서를 바꿔요.',
+      title:function(it){return (it.name||'(이름 없음)')+'T';},
+      sub:function(it){return it.role||'';},
+      thumb:'photo',
+      fields:[
+        {key:'photo',label:'프로필 사진',type:'image',hint:'세로 사진, 배경이 깔끔한 것.'},
+        {key:'name',label:'이름',type:'text',hint:'뒤에 T는 자동으로 붙어요.'},
+        {key:'role',label:'직함',type:'text',hint:'예) 중·고등 영어 전문강사'},
+        {key:'badge',label:'사진 위 배지',type:'text',hint:'예) 대표강사'},
+        {key:'tag',label:'프로필 창 첫 문구',type:'text'},
+        {key:'points',label:'강의 특징',type:'lines'},
+        {key:'edu',label:'학력',type:'lines'},
+        {key:'career',label:'약력',type:'lines'},
+        {key:'books',label:'저서',type:'lines'}
+      ],
+      blank:function(){return {id:'t'+Date.now().toString(36),name:'',role:'',subject:'',photo:'',badge:'',card:'',tag:'',points:[],edu:[],career:[],books:[]};}
+    }
+  };
+
+  var token='', data={}, saved={}, fileSha={}, uploads={}, tab='banners', editing=-1, frameReady=false;
+  var $=function(id){return document.getElementById(id);};
+
+  // ---------- GitHub API ----------
+  function gh(path,opt){
+    opt=opt||{};
+    return fetch(path.indexOf('https://')===0?path:API+path,{
+      method:opt.method||'GET',
+      headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},
+      body:opt.body?JSON.stringify(opt.body):undefined,
+      cache:'no-store'
+    }).then(function(r){
+      return r.text().then(function(t){
+        var j=t?JSON.parse(t):null;
+        if(!r.ok){var e=new Error((j&&j.message)||('HTTP '+r.status));e.status=r.status;throw e;}
+        return j;
+      });
+    });
+  }
+  function b64ToText(b64){
+    var bin=atob(b64.replace(/\n/g,'')),bytes=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  function loadSection(name){
+    return gh('/contents/'+SECTIONS[name].file+'?ref='+BRANCH).then(function(f){
+      fileSha[name]=f.sha;
+      data[name]=(JSON.parse(b64ToText(f.content)).items)||[];
+      saved[name]=JSON.stringify(data[name]);
+    });
+  }
+
+  // ---------- 로그인 ----------
+  function login(t,remember){
+    token=t.trim();
+    $('loginBtn').disabled=true;$('loginMsg').className='msg';$('loginMsg').textContent='확인 중…';
+    return gh('').then(function(repo){
+      if(!repo.permissions||!repo.permissions.push)throw new Error('이 토큰에는 저장(쓰기) 권한이 없어요. Contents: Read and write 를 켜 주세요.');
+      return gh('https://api.github.com/user').catch(function(){return {};});
+    }).then(function(user){
+      try{ if(remember)localStorage.setItem(TOKEN_KEY,token); else localStorage.removeItem(TOKEN_KEY); }catch(e){}
+      $('whoText').textContent=user&&user.login?user.login+' 님':'';
+      return Promise.all(Object.keys(SECTIONS).map(loadSection));
+    }).then(function(){
+      $('loginView').classList.add('hidden');$('appView').classList.remove('hidden');
+      $('frame').src='../index.html?edit=1';
+      renderPanel();updateDirty();
+      try{ if(!localStorage.getItem('zest-admin-help-seen')){localStorage.setItem('zest-admin-help-seen','1');$('helpModal').classList.remove('hidden');} }catch(e){}
+    }).catch(function(err){
+      token='';
+      try{localStorage.removeItem(TOKEN_KEY);}catch(e){}
+      $('loginMsg').className='msg err';
+      $('loginMsg').textContent=err.status===401?'토큰이 올바르지 않거나 만료됐어요. 새로 만들어 붙여넣어 주세요.':
+        err.status===404?'이 토큰으로는 zest-home 저장소가 보이지 않아요. Repository access 에서 zest-home 을 골랐는지 확인해 주세요.':err.message;
+    }).then(function(){$('loginBtn').disabled=false;});
+  }
+  $('loginForm').addEventListener('submit',function(e){e.preventDefault();login($('tokenInput').value,$('rememberInput').checked);});
+  $('logoutBtn').addEventListener('click',function(){
+    if(isDirty()&&!confirm('저장하지 않은 수정 내용이 사라져요. 로그아웃할까요?'))return;
+    try{localStorage.removeItem(TOKEN_KEY);}catch(e){}
+    location.reload();
+  });
+
+  // ---------- 미리보기 연결 ----------
+  function send(msg){ if(frameReady)$('frame').contentWindow.postMessage(msg,location.origin); }
+  function pushSection(name){ send({type:'zest-data',section:name,items:data[name]}); }
+  window.addEventListener('message',function(e){
+    if(e.origin!==location.origin||e.source!==$('frame').contentWindow||!e.data)return;
+    if(e.data.type==='zest-ready'){frameReady=true;Object.keys(SECTIONS).forEach(pushSection);}
+    if(e.data.type==='zest-edit'){openItem(e.data.section,e.data.index);}
+    if(e.data.type==='zest-add'&&SECTIONS[e.data.section]){addItem(e.data.section);}
+  });
+  [].forEach.call(document.querySelectorAll('[data-device]'),function(b){
+    b.addEventListener('click',function(){
+      [].forEach.call(document.querySelectorAll('[data-device]'),function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});
+      $('frameWrap').classList.toggle('mobile',b.getAttribute('data-device')==='mobile');
+    });
+  });
+
+  // ---------- 오른쪽 편집 칸 ----------
+  [].forEach.call(document.querySelectorAll('[data-tab]'),function(b){
+    b.addEventListener('click',function(){tab=b.getAttribute('data-tab');editing=-1;renderPanel();});
+  });
+  function imgSrc(p){ if(!p)return ''; return /^(data:|https?:)/.test(p)?p:'..'+(p.charAt(0)==='/'?p:'/'+p); }
+  function el(tag,attrs,kids){
+    var n=document.createElement(tag);
+    Object.keys(attrs||{}).forEach(function(k){
+      if(k==='text')n.textContent=attrs[k]; else if(k==='on')Object.keys(attrs.on).forEach(function(ev){n.addEventListener(ev,attrs.on[ev]);});
+      else n.setAttribute(k,attrs[k]);
+    });
+    (kids||[]).forEach(function(c){if(c)n.appendChild(c);});
+    return n;
+  }
+  function changed(name){ pushSection(name); updateDirty(); }
+
+  function openItem(name,index){
+    tab=name;editing=index;renderPanel();
+    send({type:'zest-focus',section:name,index:index});
+  }
+
+  function renderPanel(){
+    [].forEach.call(document.querySelectorAll('[data-tab]'),function(b){b.setAttribute('aria-selected',b.getAttribute('data-tab')===tab?'true':'false');});
+    var body=$('panelBody');body.innerHTML='';
+    var sec=SECTIONS[tab],items=data[tab]||[];
+    if(editing>=0&&items[editing]){renderForm(body,sec,items[editing]);return;}
+    var tip=el('div',{'class':'tip'});
+    tip.innerHTML='<ol><li>홈페이지 화면에서 <b>고칠 곳을 누르세요</b> (또는 아래 「수정」)</li><li>오른쪽에서 사진·글을 고치세요</li><li>다 되면 위의 <b>「저장하기」</b></li></ol>';
+    body.appendChild(tip);
+    if(sec.tip)body.appendChild(el('div',{'class':'hint',style:'color:var(--muted);font-size:13px;margin:-4px 0 12px',text:sec.tip}));
+    items.forEach(function(it,k){
+      body.appendChild(el('div',{'class':'item','data-k':k},[
+        el('span',{'class':'grip',title:'끌어서 순서 바꾸기','aria-hidden':'true',text:'⠿',on:{pointerdown:startDrag}}),
+        el('img',{src:imgSrc(it[sec.thumb]),alt:''}),
+        el('div',{'class':'t',on:{click:function(){openItem(tab,k);}}},[el('b',{text:sec.title(it)}),el('small',{text:sec.sub(it)})]),
+        el('div',{'class':'ctl'},[
+          el('button',{type:'button','class':'edit-btn',text:'✏️ 수정',on:{click:function(){openItem(tab,k);}}}),
+          el('button',{type:'button','class':'del',text:'🗑 삭제',on:{click:function(){removeItem(tab,k);}}})
+        ])
+      ]));
+    });
+    if(sec.max&&items.length>=sec.max){
+      body.appendChild(el('div',{'class':'hint',style:'text-align:center;color:var(--muted);padding:10px',text:sec.label+'는 최대 '+sec.max+'개까지예요. 새로 넣으려면 하나를 삭제해 주세요.'}));
+    }else{
+      body.appendChild(el('button',{type:'button','class':'add',text:'+ 새 '+sec.label+' 추가',on:{click:function(){addItem(tab);}}}));
+    }
+  }
+  function addItem(name){
+    var sec=SECTIONS[name];
+    if(sec.max&&data[name].length>=sec.max){toast(sec.label+'는 최대 '+sec.max+'개까지예요.','err');return;}
+    data[name].push(sec.blank());changed(name);openItem(name,data[name].length-1);
+  }
+  function removeItem(name,k){
+    var sec=SECTIONS[name],it=data[name][k];
+    if(!confirm('「'+sec.title(it)+'」을(를) 삭제할까요?\n저장하기 전까지는 「되돌리기」로 복구할 수 있어요.'))return;
+    data[name].splice(k,1);editing=-1;changed(name);renderPanel();
+  }
+  // 끌어다 놓기로 순서 바꾸기 (마우스·터치 모두)
+  function startDrag(e){
+    if(e.button>0)return;
+    e.preventDefault();
+    var row=e.currentTarget.closest('.item'),list=row.parentNode,from=+row.getAttribute('data-k');
+    var startY=e.clientY,offset=0;
+    row.classList.add('dragging');document.body.classList.add('is-dragging');
+    function rows(){return [].slice.call(list.querySelectorAll('.item'));}
+    function onMove(ev){
+      offset=ev.clientY-startY;
+      row.style.transform='translateY('+offset+'px)';
+      var others=rows().filter(function(r){return r!==row;});
+      var rect=row.getBoundingClientRect(),mid=rect.top+rect.height/2;
+      for(var i=0;i<others.length;i++){
+        var r=others[i].getBoundingClientRect();
+        if(mid<r.top+r.height/2){
+          if(others[i].previousElementSibling!==row){var before=row.getBoundingClientRect().top;list.insertBefore(row,others[i]);startY+=row.getBoundingClientRect().top-before;}
+          row.style.transform='translateY('+(ev.clientY-startY)+'px)';return;
+        }
+      }
+      var last=others[others.length-1];
+      if(last&&last.nextElementSibling!==row&&mid>last.getBoundingClientRect().top+last.getBoundingClientRect().height/2){
+        var b=row.getBoundingClientRect().top;list.insertBefore(row,last.nextSibling);startY+=row.getBoundingClientRect().top-b;
+        row.style.transform='translateY('+(ev.clientY-startY)+'px)';
+      }
+    }
+    function onUp(){
+      document.removeEventListener('pointermove',onMove);document.removeEventListener('pointerup',onUp);document.removeEventListener('pointercancel',onUp);
+      document.body.classList.remove('is-dragging');
+      var order=rows().map(function(r){return +r.getAttribute('data-k');});
+      if(order.some(function(v,i){return v!==i;})){
+        var items=data[tab];data[tab]=order.map(function(i){return items[i];});
+        changed(tab);
+        var to=order.indexOf(from);send({type:'zest-focus',section:tab,index:to});
+      }
+      renderPanel();
+    }
+    document.addEventListener('pointermove',onMove);document.addEventListener('pointerup',onUp);document.addEventListener('pointercancel',onUp);
+  }
+
+  function renderForm(body,sec,it){
+    var name=tab,items=data[name],idx=editing;
+    body.appendChild(el('button',{type:'button','class':'back',text:'← 목록으로',on:{click:function(){editing=-1;renderPanel();}}}));
+    sec.fields.forEach(function(f){
+      var box=el('div',{'class':'field'});
+      box.appendChild(el('label',{text:f.label}));
+      if(f.type==='image'){
+        var pic=el('div',{'class':'photo'});
+        var preview=it[f.key]?el('img',{src:imgSrc(it[f.key]),alt:''}):el('div',{'class':'none',text:'사진 없음'});
+        var input=el('input',{type:'file',accept:'image/png,image/jpeg,image/webp'});
+        input.addEventListener('change',function(){
+          var file=input.files&&input.files[0];if(!file)return;
+          readImage(file).then(function(dataUrl){
+            it[f.key]=dataUrl;changed(name);renderPanel();
+          }).catch(function(err){toast(err.message,'err');});
+        });
+        pic.appendChild(preview);
+        var acts=el('div',{'class':'acts'},[el('label',{},[document.createTextNode(it[f.key]?'사진 바꾸기':'사진 올리기'),input])]);
+        if(it[f.key])acts.appendChild(el('a',{href:imgSrc(it[f.key]),download:downloadName(it[f.key],sec.title(it)),text:'사진 다운로드'}));
+        pic.appendChild(acts);
+        box.appendChild(pic);
+      }else if(f.type==='lines'){
+        var ta=el('textarea',{});ta.value=(it[f.key]||[]).join('\n');
+        ta.addEventListener('input',function(){it[f.key]=ta.value.split('\n').map(function(s){return s.trim();}).filter(Boolean);changed(name);});
+        box.appendChild(ta);
+        f.hint=f.hint||'한 줄에 하나씩 적어요.';
+      }else if(f.type==='link'){
+        var cur=it[f.key]||'',known=PAGES.some(function(p){return p[0]===cur;});
+        var sel=el('select',{});
+        sel.appendChild(el('option',{value:'',text:'이동하지 않음'}));
+        PAGES.forEach(function(p){sel.appendChild(el('option',{value:p[0],text:p[1]+' 페이지'}));});
+        sel.appendChild(el('option',{value:'__custom',text:'블로그 등 다른 주소 직접 입력…'}));
+        sel.value=!cur?'':known?cur:'__custom';
+        var url=el('input',{type:'text','class':'sub-input',placeholder:'https://blog.naver.com/zestedu/...'});
+        url.value=known?'':cur;
+        url.classList.toggle('hidden',sel.value!=='__custom');
+        sel.addEventListener('change',function(){
+          var custom=sel.value==='__custom';
+          url.classList.toggle('hidden',!custom);
+          it[f.key]=custom?url.value.trim():sel.value;
+          if(custom)url.focus();
+          changed(name);
+        });
+        url.addEventListener('input',function(){it[f.key]=url.value.trim();changed(name);});
+        box.appendChild(sel);box.appendChild(url);
+      }else{
+        var inp=el('input',{type:'text'});inp.value=it[f.key]||'';
+        inp.addEventListener('input',function(){
+          it[f.key]=inp.value;
+          if(name==='banners'&&f.key==='alt')it.label=inp.value?inp.value+' 상세 보기':'';
+          if(name==='posts'&&f.key==='title')it.alt=inp.value;
+          changed(name);
+        });
+        box.appendChild(inp);
+      }
+      if(f.hint)box.appendChild(el('span',{'class':'hint',text:f.hint}));
+      body.appendChild(box);
+    });
+    body.appendChild(el('div',{'class':'form-foot'},[
+      el('button',{type:'button','class':'btn btn-danger',text:'이 '+sec.label+' 삭제',on:{click:function(){
+        if(!confirm('이 '+sec.label+'을(를) 삭제할까요? 저장하기 전까지는 되돌릴 수 있어요.'))return;
+        items.splice(idx,1);editing=-1;changed(name);renderPanel();
+      }}}),
+      el('button',{type:'button','class':'btn',text:'완료',on:{click:function(){editing=-1;renderPanel();}}})
+    ]));
+  }
+  function linkText(link){
+    if(!link)return '누르면 이동 안 함';
+    for(var i=0;i<PAGES.length;i++)if(PAGES[i][0]===link)return '→ '+PAGES[i][1]+' 페이지';
+    return /^https?:/.test(link)?'→ 외부 주소(블로그 등)':'→ '+link;
+  }
+  function downloadName(p,title){
+    if(p.indexOf('data:')===0)return (title||'사진').replace(/[\\/:*?"<>|]/g,'')+(/^data:image\/png/.test(p)?'.png':'.jpg');
+    return p.split('/').pop();
+  }
+  $('helpBtn').addEventListener('click',function(){$('helpModal').classList.remove('hidden');});
+  $('helpClose').addEventListener('click',function(){$('helpModal').classList.add('hidden');});
+  $('helpModal').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');});
+
+  // 사진: 너무 크면 가로 2000px 로 줄인다 (PNG는 투명 배경 유지)
+  function readImage(file){
+    return new Promise(function(resolve,reject){
+      if(!/^image\/(png|jpeg|webp)$/.test(file.type))return reject(new Error('JPG, PNG, WEBP 사진만 올릴 수 있어요.'));
+      if(file.size>20*1024*1024)return reject(new Error('사진이 너무 커요 (20MB 이하).'));
+      var fr=new FileReader();
+      fr.onerror=function(){reject(new Error('사진을 읽지 못했어요.'));};
+      fr.onload=function(){
+        var url=fr.result,img=new Image();
+        img.onerror=function(){reject(new Error('사진을 열지 못했어요.'));};
+        img.onload=function(){
+          var MAX=2000;
+          if(img.naturalWidth<=MAX&&file.size<=1.5*1024*1024)return resolve(url);
+          var w=Math.min(MAX,img.naturalWidth),h=Math.round(img.naturalHeight*w/img.naturalWidth);
+          var c=document.createElement('canvas');c.width=w;c.height=h;
+          c.getContext('2d').drawImage(img,0,0,w,h);
+          resolve(file.type==='image/png'?c.toDataURL('image/png'):c.toDataURL('image/jpeg',0.9));
+        };
+        img.src=url;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+
+  // ---------- 변경 상태 ----------
+  function dirtyNames(){return Object.keys(SECTIONS).filter(function(n){return JSON.stringify(data[n])!==saved[n];});}
+  function isDirty(){return dirtyNames().length>0;}
+  function updateDirty(){
+    var d=dirtyNames();
+    $('saveBtn').disabled=!d.length;
+    $('dirtyText').classList.toggle('hidden',!d.length);
+    $('discardBtn').classList.toggle('hidden',!d.length);
+    $('dirtyText').textContent=d.length?'● 아직 저장 안 됨':'';
+  }
+  $('discardBtn').addEventListener('click',function(){
+    if(!confirm('저장하지 않은 수정 내용을 모두 되돌릴까요?'))return;
+    Object.keys(SECTIONS).forEach(function(n){data[n]=JSON.parse(saved[n]);pushSection(n);});
+    editing=-1;renderPanel();updateDirty();
+  });
+  window.addEventListener('beforeunload',function(e){if(token&&isDirty()){e.preventDefault();e.returnValue='';}});
+
+  // ---------- 저장: 바뀐 파일과 새 사진을 커밋 하나로 올린다 ----------
+  function stamp(){var d=new Date(),p=function(n){return ('0'+n).slice(-2);};return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds());}
+  $('saveBtn').addEventListener('click',function(){
+    var names=dirtyNames();if(!names.length)return;
+    for(var ni=0;ni<names.length;ni++){
+      var sn=names[ni],sc=SECTIONS[sn];
+      for(var ii=0;ii<data[sn].length;ii++){
+        var miss=(sc.required||[]).filter(function(r){return !data[sn][ii][r[0]];});
+        if(miss.length){
+          openItem(sn,ii);
+          toast((ii+1)+'번째 '+sc.label+'에 「'+miss.map(function(r){return r[1];}).join('」, 「')+'」이(가) 비어 있어요. 채우거나 삭제한 뒤 저장해 주세요.','err');
+          return;
+        }
+      }
+    }
+    var btn=$('saveBtn');btn.disabled=true;btn.textContent='저장 중…';
+    var headSha,baseTree,entries=[],seq=0,st=stamp(),out={};
+    names.forEach(function(n){out[n]=JSON.parse(JSON.stringify(data[n]));});
+    // 1) 다른 사람이 먼저 같은 파일을 고쳤는지 확인
+    Promise.all(names.map(function(n){
+      return gh('/contents/'+SECTIONS[n].file+'?ref='+BRANCH).then(function(f){
+        if(f.sha!==fileSha[n])throw new Error('다른 곳에서 「'+SECTIONS[n].label+'」 내용을 먼저 수정했어요. 지금 수정한 내용을 메모해 두고 새로고침한 뒤 다시 해 주세요.');
+      });
+    })).then(function(){
+      return gh('/git/ref/heads/'+BRANCH);
+    }).then(function(ref){
+      headSha=ref.object.sha;
+      return gh('/git/commits/'+headSha);
+    }).then(function(c){
+      baseTree=c.tree.sha;
+      // 2) 새로 올린 사진을 images/ 에 파일로 만든다
+      var jobs=[];
+      names.forEach(function(n){
+        out[n].forEach(function(it){
+          ['image','photo'].forEach(function(key){
+            var v=it[key];if(!v||v.indexOf('data:')!==0)return;
+            var m=/^data:image\/(png|jpeg|webp);base64,(.*)$/.exec(v);if(!m)return;
+            var ext=m[1]==='jpeg'?'jpg':m[1],path='images/edit-'+st+'-'+(++seq)+'.'+ext;
+            jobs.push(gh('/git/blobs',{method:'POST',body:{content:m[2],encoding:'base64'}}).then(function(b){
+              entries.push({path:path,mode:'100644',type:'blob',sha:b.sha});
+              it[key]='/'+path;
+            }));
+          });
+        });
+      });
+      return Promise.all(jobs);
+    }).then(function(){
+      // 3) 데이터 파일
+      names.forEach(function(n){
+        entries.push({path:SECTIONS[n].file,mode:'100644',type:'blob',content:JSON.stringify({items:out[n]},null,2)+'\n'});
+      });
+      return gh('/git/trees',{method:'POST',body:{base_tree:baseTree,tree:entries}});
+    }).then(function(tree){
+      var what=names.map(function(n){return {banners:'메인 배너',posts:'공지 카드',teachers:'강사진'}[n];}).join('·');
+      return gh('/git/commits',{method:'POST',body:{message:'관리자 화면에서 '+what+'을(를) 수정한다.',tree:tree.sha,parents:[headSha]}});
+    }).then(function(commit){
+      return gh('/git/refs/heads/'+BRANCH,{method:'PATCH',body:{sha:commit.sha,force:false}});
+    }).then(function(){
+      return Promise.all(names.map(loadSection));
+    }).then(function(){
+      names.forEach(pushSection);renderPanel();updateDirty();
+      toast('저장했어요! 1~2분 뒤 홈페이지에 반영돼요.','ok');
+    }).catch(function(err){
+      toast(err.status===401?'로그인이 만료됐어요. 로그아웃 후 다시 로그인해 주세요.':
+        err.status===422||err.status===409?'저장하는 사이 홈페이지가 바뀌었어요. 잠시 후 다시 저장해 주세요.':
+        ('저장하지 못했어요: '+err.message),'err');
+      names.forEach(pushSection);renderPanel();updateDirty();
+    }).then(function(){btn.textContent='저장하기';updateDirty();});
+  });
+
+  var toastTimer;
+  function toast(text,kind){
+    var t=$('toast');t.textContent=text;t.className='toast'+(kind?' '+kind:'');
+    clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.add('hidden');},kind==='err'?8000:4000);
+  }
+
+  // 저장된 토큰이 있으면 바로 로그인
+  try{ var saved0=localStorage.getItem(TOKEN_KEY); if(saved0)login(saved0,true); }catch(e){}
+})();
+</script>
 </body>
 </html>

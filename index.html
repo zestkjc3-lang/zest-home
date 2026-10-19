@@ -725,6 +725,9 @@
 
   // ===== 강사 데이터: data/teachers.json (zestedu.co.kr/admin 에서 수정) =====
   var TEACHERS = [];
+  // /admin 편집 화면의 미리보기(iframe ?edit=1)일 때만 true
+  var EDIT_MODE=window.parent!==window&&/[?&]edit=1/.test(location.search);
+  var POST_MAX=6;
   // 관리자 화면에서 입력한 글자가 HTML 태그로 해석되지 않게 바꾼다
   function esc(v){
     return String(v==null?'':v).replace(/[&<>"']/g,function(c){
@@ -741,12 +744,14 @@
   }
 
   // render lineup cards
-  loadData('teachers',function(items){
+  function renderTeachers(items){
     TEACHERS=items;
     var box=document.getElementById('lineup');
-    TEACHERS.forEach(function(t){
+    box.innerHTML='';
+    TEACHERS.forEach(function(t,k){
       var el=document.createElement('div');
       el.className='tcard';
+      el.setAttribute('data-edit','teachers:'+k);
       el.innerHTML=
         '<div class="stage"><span class="badge">'+esc(t.badge)+'</span>'+
         '<img src="'+esc(asset(t.photo))+'" alt="'+esc(t.name)+'" onerror="this.classList.add(\'broken\')"/>'+
@@ -764,14 +769,16 @@
       slot.innerHTML='<div class="stage"></div><div class="meta"><b>&nbsp;</b><span>&nbsp;</span></div><div class="more">&nbsp;</div>';
       box.appendChild(slot);
     }
-  });
+  }
 
   // render 공지·블로그 cards
-  loadData('posts',function(items){
+  function renderPosts(items){
     var grid=document.getElementById('postGrid');
-    items.forEach(function(p){
+    grid.innerHTML='';
+    items.forEach(function(p,k){
       var a=document.createElement('a');
       a.className='post reveal';
+      a.setAttribute('data-edit','posts:'+k);
       a.href=p.link||'#blog';
       if(/^https?:/.test(p.link||'')){a.target='_blank';a.rel='noopener';}
       a.style.cssText='background:var(--paper);border:1px solid var(--line);border-radius:24px;overflow:hidden';
@@ -783,7 +790,19 @@
       grid.appendChild(a);
       if(window.observeReveal)window.observeReveal(a);
     });
-  });
+    // 편집 화면에서만: 남은 자리(최대 6칸)에 「새 카드 추가」 빈칸을 보여 준다
+    if(EDIT_MODE){
+      for(var k=items.length;k<POST_MAX;k++){
+        var slot=document.createElement('div');
+        slot.className='post-add';
+        slot.setAttribute('data-add','posts');
+        slot.innerHTML='<span>＋</span><b>여기에 새 카드 추가</b>';
+        grid.appendChild(slot);
+      }
+    }
+  }
+  loadData('teachers',renderTeachers);
+  loadData('posts',renderPosts);
 
   function block(title,items){
     if(!items||!items.length)return '';
@@ -895,24 +914,35 @@
     }
   })();
   // hero slider (콴다일로식 인디케이터 + 좌우 버튼) — 배너 데이터: data/banners.json
-  (function(){
+  var heroSlider=(function(){
     var track=document.getElementById('heroTrack');
     var dotsWrap=document.getElementById('heroDots');
     var prevBtn=document.getElementById('heroPrev');
     var nextBtn=document.getElementById('heroNext');
-    if(!track||!dotsWrap)return;
-    fetch('data/banners.json',{cache:'no-cache'})
-      .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
-      .then(function(d){render((d&&d.items)||[]);})
-      .catch(function(err){console.error('배너 데이터를 불러오지 못했습니다',err);});
+    if(!track||!dotsWrap)return null;
+    var n=0,i=0,timer=null,TOUCH_MS=5000,autoplay=true;
+    function go(to){
+      if(!n)return;
+      i=(to+n)%n;
+      track.style.transform='translateX('+(-i*100)+'%)';
+      [].slice.call(dotsWrap.children).forEach(function(b,bi){
+        b.setAttribute('aria-current',bi===i?'true':'false');
+      });
+    }
+    function restart(){
+      if(timer)clearInterval(timer);
+      timer=autoplay?setInterval(function(){go(i+1);},TOUCH_MS):null;
+    }
     function render(items){
+      track.innerHTML='';dotsWrap.innerHTML='';
       items=items.filter(function(it){return it&&it.image;});
       items.forEach(function(it,k){
         var fig=document.createElement('figure');
         fig.className='slide';
+        fig.setAttribute('data-edit','banners:'+k);
         fig.setAttribute('aria-label',(k+1)+' / '+items.length);
         var img=document.createElement('img');
-        img.src=it.image.replace(/^\//,'');
+        img.src=asset(it.image);
         img.alt=it.alt||'';
         var wrap=fig;
         if(it.link){
@@ -925,29 +955,14 @@
         }
         wrap.appendChild(img);
         track.appendChild(fig);
+        var b=document.createElement('button');
+        b.type='button';
+        b.setAttribute('aria-label',(k+1)+'번째 배너');
+        b.addEventListener('click',function(){go(k);restart();});
+        dotsWrap.appendChild(b);
       });
-      if(items.length)init();
-    }
-    function init(){
-    var slides=[].slice.call(track.querySelectorAll('.slide'));
-    var n=slides.length,i=0,timer=null,TOUCH_MS=5000;
-    function go(to){
-      i=(to+n)%n;
-      track.style.transform='translateX('+(-i*100)+'%)';
-      [].slice.call(dotsWrap.children).forEach(function(b,bi){
-        b.setAttribute('aria-current',bi===i?'true':'false');
-      });
-    }
-    slides.forEach(function(_,bi){
-      var b=document.createElement('button');
-      b.type='button';
-      b.setAttribute('aria-label',(bi+1)+'번째 배너');
-      b.addEventListener('click',function(){go(bi);restart();});
-      dotsWrap.appendChild(b);
-    });
-    function restart(){
-      if(timer)clearInterval(timer);
-      timer=setInterval(function(){go(i+1);},TOUCH_MS);
+      n=items.length;
+      go(Math.min(i,Math.max(n-1,0)));restart();
     }
     if(prevBtn)prevBtn.addEventListener('click',function(e){e.stopPropagation();go(i-1);restart();});
     if(nextBtn)nextBtn.addEventListener('click',function(e){e.stopPropagation();go(i+1);restart();});
@@ -962,8 +977,8 @@
     track.addEventListener('click',function(e){
       if(swiped){e.preventDefault();e.stopPropagation();swiped=false;}
     },true);
-    go(0);restart();
-    }
+    loadData('banners',render);
+    return {render:render,go:go,setAutoplay:function(on){autoplay=on;restart();}};
   })();
   // reveal
   (function(){
@@ -976,6 +991,56 @@
     // 데이터 파일을 읽어 나중에 그리는 카드도 같은 등장 효과를 받게 한다
     window.observeReveal=function(e){io.observe(e);};
     els.forEach(window.observeReveal);
+  })();
+  // 편집 모드: /admin 화면의 미리보기(iframe ?edit=1) 안에서만 켜진다
+  (function(){
+    if(!EDIT_MODE)return;
+    var parentWin=window.parent,origin=location.origin;
+    var st=document.createElement('style');
+    st.textContent=
+      '[data-edit]{position:relative;cursor:pointer!important}'+
+      '[data-edit]:hover{outline:3px solid #2f6fed;outline-offset:3px}'+
+      '[data-edit]::after{content:"✏️ 눌러서 수정";position:absolute;top:10px;left:10px;z-index:5;background:#2f6fed;color:#fff;font-size:13px;font-weight:700;padding:5px 10px;border-radius:999px;pointer-events:none;opacity:0;transition:opacity .15s}'+
+      '[data-edit]:hover::after,[data-edit].zest-selected::after{opacity:1}'+
+      '[data-edit].zest-selected{outline:3px solid #f08c00;outline-offset:3px}'+
+      '.post-add{min-height:320px;border:3px dashed #c9bfa6;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#8a8170;cursor:pointer;background:rgba(255,255,255,.5)}'+
+      '.post-add span{font-size:40px;line-height:1}.post-add b{font-size:16px}'+
+      '.post-add:hover{border-color:#2f6fed;color:#2f6fed;background:#f5f8ff}'+
+      '.reveal{opacity:1!important;transform:none!important}';
+    document.head.appendChild(st);
+    if(heroSlider)heroSlider.setAutoplay(false);
+    // 미리보기 안에서는 링크로 이동하지 않고, 수정할 항목만 골라 편집 화면에 알린다
+    document.addEventListener('click',function(e){
+      var add=e.target.closest('[data-add]');
+      if(add){e.preventDefault();e.stopPropagation();parentWin.postMessage({type:'zest-add',section:add.getAttribute('data-add')},origin);return;}
+      var hit=e.target.closest('[data-edit]');
+      var nav=e.target.closest('.hero-nav,.hero-dots button');
+      if(nav&&!hit)return;
+      if(hit){
+        e.preventDefault();e.stopPropagation();
+        var parts=hit.getAttribute('data-edit').split(':');
+        parentWin.postMessage({type:'zest-edit',section:parts[0],index:+parts[1]},origin);
+        return;
+      }
+      if(e.target.closest('a'))e.preventDefault();
+    },true);
+    var renderers={banners:heroSlider&&heroSlider.render,posts:renderPosts,teachers:renderTeachers};
+    window.addEventListener('message',function(e){
+      if(e.origin!==origin||e.source!==parentWin||!e.data)return;
+      var d=e.data;
+      if(d.type==='zest-data'&&renderers[d.section])renderers[d.section](d.items);
+      if(d.type==='zest-focus'){
+        [].forEach.call(document.querySelectorAll('.zest-selected'),function(x){x.classList.remove('zest-selected');});
+        var el=document.querySelector('[data-edit="'+d.section+':'+d.index+'"]');
+        if(!el)return;
+        el.classList.add('zest-selected');
+        // 배너는 슬라이드 틀(가로 넘김)을 기준으로 화면을 옮겨야 틀 안쪽이 밀리지 않는다
+        var target=el;
+        if(d.section==='banners'&&heroSlider){heroSlider.go(d.index);target=el.closest('.hero-slider');target.scrollLeft=0;}
+        target.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});
+      }
+    });
+    parentWin.postMessage({type:'zest-ready'},origin);
   })();
 </script>
 </body>
