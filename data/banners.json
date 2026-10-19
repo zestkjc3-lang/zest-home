@@ -1,0 +1,34 @@
+{
+  "items": [
+    {
+      "image": "/images/jungwon-hero-wide.jpg",
+      "alt": "2026학년도 1학기 중원고 영어 성과 — 전교 1등 3명, 제스트에듀 박지유T",
+      "link": "jungwon.html",
+      "label": "중원고 1학기 영어 성과 상세 보기"
+    },
+    {
+      "image": "/images/hero-slide-2.png",
+      "alt": "제스트에듀 2026년 1학기 기말고사 우수성적발표",
+      "link": "grades.html",
+      "label": "우수성적 발표 상세 보기"
+    },
+    {
+      "image": "/images/grades-sangil-cover-wide.png",
+      "alt": "상일고1 1학기 기말고사 결과 — 전교 1·3등 배출",
+      "link": "classroom.html",
+      "label": "상일고1 전교 1·3등 배출 상세 보기"
+    },
+    {
+      "image": "/images/jeongsi-hero.png",
+      "alt": "제스트에듀 정시반 개강 — 윤재남T · 유수미T · 박지유T · 김상학T",
+      "link": "jeongsi.html",
+      "label": "정시반 개강 상세 보기"
+    },
+    {
+      "image": "/images/naesin-hero-wide.png",
+      "alt": "상위권 맞춤 내신 대비 — 제스트에듀 수미T",
+      "link": "naesin.html",
+      "label": "상위권 맞춤 내신 대비 상세 보기"
+    }
+  ]
+}

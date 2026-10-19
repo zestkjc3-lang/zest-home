@@ -21,7 +21,50 @@
 
 ---
 
+## 관리자 페이지 (배너·공지 카드·강사진 수정)
+
+- **주소:** https://zestedu.co.kr/admin (Sveltia CMS, 서버 없음)
+- **구조:** 메인 페이지의 아래 세 영역은 `data/` 폴더의 JSON을 읽어 그린다.
+  - 메인 배너 → `data/banners.json`
+  - 공지 · 블로그 카드 → `data/posts.json`
+  - 강사진(카드 + 프로필 창) → `data/teachers.json`
+- 관리자 화면에서 저장하면 브라우저가 GitHub API로 `main`에 직접 커밋 → GitHub Pages가 1~2분 뒤 반영.
+- **설정 파일:** `admin/config.yml` (편집 항목), `admin/index.html` (Sveltia 스크립트, 버전 고정 `0.229.0`)
+- 업로드한 사진은 `images/`에 저장된다.
+
+### 로그인 토큰 발급 (사람마다 1회, 1년마다 갱신)
+
+1. GitHub → Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate new token
+2. Expiration: **1년(Custom)** / Repository access: **Only select repositories → `zest-home`**
+3. Permissions → Repository permissions → **Contents: Read and write** (나머지는 건드리지 않음)
+4. 발급된 토큰을 `/admin`의 **「액세스 토큰으로 로그인」**에 붙여넣기
+   - 「GitHub(으)로 로그인」 버튼은 중계 서버가 없어 동작하지 않음 → 토큰 로그인만 사용
+- 토큰은 비밀번호와 같다. 메신저·메일로 공유하지 않고, 공용 PC에서는 사용 후 로그아웃.
+- 직원 계정은 저장소 Settings → Collaborators로 초대 + GitHub 2단계 인증 필수.
+- 유출 의심 시: 해당 토큰 Revoke → 잘못된 커밋은 `git revert`.
+
+### 수정 방법
+
+관리자 화면 → **메인 페이지** → 아래 중 하나 선택 → 항목 추가/삭제/드래그로 순서 변경 → 저장.
+
+- **메인 배너:** 가로 사진(약 1024×716 비율) 권장. 비율이 다르면 가운데 기준으로 잘림.
+- **공지 · 블로그 카드:** 정사각형 사진 권장. 링크에 `https://...`를 넣으면 새 창으로 열림.
+- **강사진:** 영문 아이디는 강사끼리 겹치지 않게. 이름 뒤 `T`는 자동으로 붙음.
+
+### 로컬에서 미리 해보기 (토큰·커밋 없이)
+
+1. 저장소 폴더에서 `python3 -m http.server 5500` 실행
+2. **크롬/엣지**로 http://127.0.0.1:5500/admin → **「로컬 저장소로 작업」** → `zest-home` 폴더 선택
+3. 수정·저장하면 내 컴퓨터의 `data/*.json`, `images/`만 바뀐다 → http://127.0.0.1:5500 새로고침해서 확인
+4. 마음에 안 들면 `git checkout -- data/ && git clean -n images/`로 확인 후 되돌리기
+
+---
+
 ## 해야 할 일
+
+### 0. 관리자 페이지 첫 확인
+
+- [ ] 푸시 후 토큰 발급 → `/admin` 로그인 → 배너 하나 순서 바꿔 저장 → 라이브 반영 확인 → 원복
 
 ### 1. FormSubmit 최초 활성화 (필수)
 

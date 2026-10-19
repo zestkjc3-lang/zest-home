@@ -73,6 +73,7 @@
   .hero-banner{margin:28px auto 0;width:90%;max-width:min(calc(var(--maxw) * 0.9),849px);position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:10px}
   .hero-slider{grid-column:2;grid-row:1;position:relative;overflow:hidden;border-radius:22px;background:#fff;box-shadow:0 22px 56px -30px rgba(28,26,21,.32);border:1px solid rgba(221,213,195,.7)}
   .hero-slider .track{display:flex;width:100%;transition:transform .45s ease;will-change:transform}
+  .hero-slider .track:empty{aspect-ratio:1024/716;background:#f4efe4}
   .hero-slider .slide{flex:0 0 100%;width:100%;min-width:100%;margin:0;padding:0;background:#f4efe4;aspect-ratio:1024/716;overflow:hidden}
   .hero-slider .slide-link{display:block;width:100%;height:100%;color:inherit;text-decoration:none;cursor:pointer}
   .hero-slider .slide img{display:block;width:100%;height:100%;object-fit:cover;object-position:center;vertical-align:top}
@@ -400,33 +401,8 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
       </button>
       <div class="hero-slider" aria-roledescription="carousel" aria-label="제스트에듀 안내 배너">
-        <div class="track" id="heroTrack">
-          <figure class="slide" aria-label="1 / 5">
-            <a class="slide-link" href="jungwon.html" aria-label="중원고 1학기 영어 성과 상세 보기">
-              <img src="images/jungwon-hero-wide.jpg?v=3" alt="2026학년도 1학기 중원고 영어 성과 — 전교 1등 3명, 제스트에듀 박지유T" width="1116" height="779" />
-            </a>
-          </figure>
-          <figure class="slide" aria-label="2 / 5">
-            <a class="slide-link" href="grades.html" aria-label="우수성적 발표 상세 보기">
-              <img src="images/hero-slide-2.png?v=6" alt="제스트에듀 2026년 1학기 기말고사 우수성적발표" width="1024" height="716" />
-            </a>
-          </figure>
-          <figure class="slide" aria-label="3 / 5">
-            <a class="slide-link" href="classroom.html" aria-label="상일고1 전교 1·3등 배출 상세 보기">
-              <img src="images/grades-sangil-cover-wide.png?v=1" alt="상일고1 1학기 기말고사 결과 — 전교 1·3등 배출" width="1116" height="779" />
-            </a>
-          </figure>
-          <figure class="slide" aria-label="4 / 5">
-            <a class="slide-link" href="jeongsi.html" aria-label="정시반 개강 상세 보기">
-              <img src="images/jeongsi-hero.png?v=6" alt="제스트에듀 정시반 개강 — 윤재남T · 유수미T · 박지유T · 김상학T" width="761" height="530" />
-            </a>
-          </figure>
-          <figure class="slide" aria-label="5 / 5">
-            <a class="slide-link" href="naesin.html" aria-label="상위권 맞춤 내신 대비 상세 보기">
-              <img src="images/naesin-hero-wide.png?v=1" alt="상위권 맞춤 내신 대비 — 제스트에듀 수미T" width="814" height="568" />
-            </a>
-          </figure>
-        </div>
+        <!-- 배너 목록은 data/banners.json에서 읽어 그린다 (zestedu.co.kr/admin 에서 수정) -->
+        <div class="track" id="heroTrack"></div>
       </div>
       <div class="hero-dots" id="heroDots" role="tablist" aria-label="배너 선택"></div>
     </div>
@@ -529,19 +505,8 @@
       <h2>공지 · 블로그</h2>
       <p>제스트에듀의 소식과 학습 정보를 네이버 블로그에서 만나보세요.</p>
     </div>
-    <div class="blog-grid">
-      <a class="post reveal" href="ban-guide.html" style="background:var(--paper);border:1px solid var(--line);border-radius:24px;overflow:hidden">
-        <div class="ph-img sharp"><img src="images/blog1.png?v=1" alt="학교별 개설반 안내" width="572" height="572" onerror="this.removeAttribute('src')"/><div class="label">📷<small>블로그 이미지</small></div></div>
-        <div style="padding:22px 24px 26px"><span style="font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.05em">공지</span><h3 style="font-size:18px;font-weight:700;margin:9px 0 14px;color:var(--ink);line-height:1.45">개설반 안내</h3><p style="font-size:14px;color:var(--muted-2);font-weight:600">자세히 보기 →</p></div>
-      </a>
-      <a class="post reveal" href="naesin.html" style="background:var(--paper);border:1px solid var(--line);border-radius:24px;overflow:hidden">
-        <div class="ph-img sharp"><img src="images/blog2.png?v=4" alt="상위권 맞춤 내신 대비 — 제스트에듀 수미T" width="568" height="568" onerror="this.removeAttribute('src')"/><div class="label">📷<small>블로그 이미지</small></div></div>
-        <div style="padding:22px 24px 26px"><span style="font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.05em">학습정보</span><h3 style="font-size:18px;font-weight:700;margin:9px 0 14px;color:var(--ink);line-height:1.45">내신 대비 이렇게 준비하세요</h3><p style="font-size:14px;color:var(--muted-2);font-weight:600">자세히 보기 →</p></div>
-      </a>
-      <a class="post reveal" href="classroom.html" style="background:var(--paper);border:1px solid var(--line);border-radius:24px;overflow:hidden">
-        <div class="ph-img sharp"><img src="images/grades-sangil-cover.png?v=1" alt="상일고1 1학기 전교 1·3등 배출 — 제스트에듀" width="773" height="779" onerror="this.removeAttribute('src')"/><div class="label">📷<small>블로그 이미지</small></div></div>
-        <div style="padding:22px 24px 26px"><span style="font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.05em">성적 발표</span><h3 style="font-size:18px;font-weight:700;margin:9px 0 14px;color:var(--ink);line-height:1.45">상일고1 전교 1·3등 배출!</h3><p style="font-size:14px;color:var(--muted-2);font-weight:600">자세히 보기 →</p></div>
-      </a>
+    <!-- 카드 목록은 data/posts.json에서 읽어 그린다 (zestedu.co.kr/admin 에서 수정) -->
+    <div class="blog-grid" id="postGrid">
     </div>
     <div style="text-align:center;margin-top:44px">
       <a href="https://blog.naver.com/zestedu" target="_blank" rel="noopener" class="btn btn-ghost">네이버 블로그 전체 보기 →</a>
@@ -758,53 +723,35 @@
     document.addEventListener('keydown',function(e){ if(e.key==='Escape')close(); });
   })();
 
-  // ===== 강사 데이터 (여기만 수정하면 카드+모달 모두 반영) =====
-  var TEACHERS = [
-    {
-      id:'yun', name:'윤재남', role:'고3 영어 대표강사', subject:'정시 · 수능', photo:'images/teacher-yunjaenam.png?v=11',
-      badge:'대표강사', card:'확실한 수능 1등급을 향한, 급이 다른 영어',
-      tag:'“확실한 수능 1등급을 향한, 급이 다른 윤재남 영어 — 정시영어 고민 끝!”',
-      edu:['서울대학교 영문학과 졸업','대원외고 졸업'],
-      career:['現 제스트에듀 고3 영어 대표강사','現 모비딕영어연구소 소장','現 EBS 교재 사전검토위원','現 강남종로 재종반(대치) 강사','前 강남구청 수능 인터넷강사','前 강남대성(서울) 강사','前 시대인재(대전) 강사'],
-      books:['고백서: 고급영어백서','스탠다드 구문독해: 영어문장해석식 264','스탠다드 영문법','모비딕 수능영어 100제','7일 만에 끝내는 영단어/영숙어','대치동 1등급 영문법']
-    },
-    {
-      id:'yu', name:'유수미', role:'중·고등 영어 전문강사', subject:'내신 · 수행', photo:'images/teacher-yusumi.png?v=2',
-      badge:'내신·수행', card:'편안하고 확실한 영어, 수미쌤과 영어실력 UP',
-      tag:'“편안하고 확실한 영어 — 수미쌤과 영어실력 UP”',
-      points:['Compact 내신! Perfect 수행! — 교과서 + 기출 분석 + 변형 대비를 압축한 수제 노트','Logical Reading! — 논리적 독해로 지문 흐름을 자연스럽게 이해','Synergy Up! — 깔끔한 판서 강의 노트 + 개별 맞춤 과제·첨삭','More than Learning! — 웃음이 있는 편안한 수업으로 학습 이상의 교감'],
-      career:['現 제스트에듀 중/고등 영어 전문 강사','現 ZEST ENGLISH LAB 선임 연구원','前 ELL학원 중/고등 전임강사'],
-      books:['Fantastic Grammar','내신완성 The Final Series','수능 완벽 대비 실전 훈련 Series','최다오답 TOP 15 Series']
-    },
-    {
-      id:'park', name:'박지유', role:'중·고등 영어 전문강사', subject:'논리 독해 · 내신', photo:'images/teacher-parkjiyu.png?v=2',
-      badge:'논리 독해', card:'실력도 점수도, 결국은 상승 엔딩',
-      tag:'“실력도 점수도 결국은 상승 엔딩”',
-      points:['지문의 논리가 정답의 논리 — 논리 구조와 맥락으로 지문을 명확하게','언어의 차이를 이해하라 — 정확하고 꼼꼼한 구문 독해로 실력 다지기','출제자의 의도 파악이 진리 — 감이 아닌 의도 분석으로 흔들림 없이','맞춤형 교재의 힘 — 최적화된 내신교재로 효율적 시간관리','학생 특성별 철저한 관리 — 약점 파악·상시 질의응답으로 성적 상승 극대화'],
-      edu:['고려대학교(안암 캠퍼스) 졸업','경기외고 영문과 졸업','석천중학교 졸업'],
-      career:['現 제스트에듀 중/고등 영어 전문 강사','前 (송도) 쎄리영어 고등부 강사','前 (삼산) 더뉴에버 중고등부 팀장']
-    },
-    {
-      id:'kim', name:'김상학', role:'중·고등 영어 전문강사', subject:'입시 영어 · 독해', photo:'images/teacher-kimsanghak.png?v=2',
-      badge:'입시 러닝메이트', card:'입시 영어 Marathon의 Running Mate',
-      tag:'“입시 영어 Marathon의 Running Mate”',
-      points:['kNow! How? N차 반복의 힘 — 개념시트·핵심문법·3개년 기출·심화 test 반복','Self-Made 개념 노트 — 자기만의 언어로 요약·구체화하며 내재화','Thread 독해 — 문장 연결고리를 꿰어 나무(내용)와 숲(주제)을 동시에','ACE English — Application(5형식 적용)·Classification(품사 구분)·Expansion(어휘 확장)'],
-      edu:['고려대학교(안암 캠퍼스) 졸업','압구정고 졸업'],
-      career:['現 제스트에듀 중/고등 영어 전문 강사','前 (일산) 이지베스트학원 중/고등 강사','前 (파주) 비상아이비츠학원 중/고등 강사']
-    }
-  ];
+  // ===== 강사 데이터: data/teachers.json (zestedu.co.kr/admin 에서 수정) =====
+  var TEACHERS = [];
+  // 관리자 화면에서 입력한 글자가 HTML 태그로 해석되지 않게 바꾼다
+  function esc(v){
+    return String(v==null?'':v).replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  // CMS는 사진 경로를 /images/... 로 저장한다 → 페이지 기준 상대 경로로 바꾼다
+  function asset(p){return String(p||'').replace(/^\//,'');}
+  function loadData(name,cb){
+    fetch('data/'+name+'.json',{cache:'no-cache'})
+      .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+      .then(function(d){cb((d&&d.items)||[]);})
+      .catch(function(err){console.error('data/'+name+'.json 을 불러오지 못했습니다',err);});
+  }
 
   // render lineup cards
-  (function(){
+  loadData('teachers',function(items){
+    TEACHERS=items;
     var box=document.getElementById('lineup');
     TEACHERS.forEach(function(t){
       var el=document.createElement('div');
       el.className='tcard';
       el.innerHTML=
-        '<div class="stage"><span class="badge">'+t.badge+'</span>'+
-        '<img src="'+t.photo+'" alt="'+t.name+'" onerror="this.classList.add(\'broken\')"/>'+
-        '<div class="ph-slot">📷<small>'+t.name+' 선생님 사진</small></div></div>'+
-        '<div class="meta"><b>'+t.name+'<span class="t">T</span></b><span>'+t.role+'</span></div>'+
+        '<div class="stage"><span class="badge">'+esc(t.badge)+'</span>'+
+        '<img src="'+esc(asset(t.photo))+'" alt="'+esc(t.name)+'" onerror="this.classList.add(\'broken\')"/>'+
+        '<div class="ph-slot">📷<small>'+esc(t.name)+' 선생님 사진</small></div></div>'+
+        '<div class="meta"><b>'+esc(t.name)+'<span class="t">T</span></b><span>'+esc(t.role)+'</span></div>'+
         '<div class="more">프로필 보기 →</div>';
       el.addEventListener('click',function(){openTeacher(t.id);});
       box.appendChild(el);
@@ -817,11 +764,30 @@
       slot.innerHTML='<div class="stage"></div><div class="meta"><b>&nbsp;</b><span>&nbsp;</span></div><div class="more">&nbsp;</div>';
       box.appendChild(slot);
     }
-  })();
+  });
+
+  // render 공지·블로그 cards
+  loadData('posts',function(items){
+    var grid=document.getElementById('postGrid');
+    items.forEach(function(p){
+      var a=document.createElement('a');
+      a.className='post reveal';
+      a.href=p.link||'#blog';
+      if(/^https?:/.test(p.link||'')){a.target='_blank';a.rel='noopener';}
+      a.style.cssText='background:var(--paper);border:1px solid var(--line);border-radius:24px;overflow:hidden';
+      a.innerHTML=
+        '<div class="ph-img sharp"><img src="'+esc(asset(p.image))+'" alt="'+esc(p.alt||p.title)+'" onerror="this.removeAttribute(\'src\')"/><div class="label">📷<small>블로그 이미지</small></div></div>'+
+        '<div style="padding:22px 24px 26px"><span style="font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.05em">'+esc(p.category)+'</span>'+
+        '<h3 style="font-size:18px;font-weight:700;margin:9px 0 14px;color:var(--ink);line-height:1.45">'+esc(p.title)+'</h3>'+
+        '<p style="font-size:14px;color:var(--muted-2);font-weight:600">자세히 보기 →</p></div>';
+      grid.appendChild(a);
+      if(window.observeReveal)window.observeReveal(a);
+    });
+  });
 
   function block(title,items){
     if(!items||!items.length)return '';
-    var lis=items.map(function(i){return '<li>'+i+'</li>';}).join('');
+    var lis=items.map(function(i){return '<li>'+esc(i)+'</li>';}).join('');
     return '<div class="tblock"><h4>'+title+'</h4><ul>'+lis+'</ul></div>';
   }
   function openTeacher(id){
@@ -829,7 +795,7 @@
     document.getElementById('tmName').textContent=t.name;
     document.getElementById('tmRole').textContent=t.role;
     document.getElementById('tmTag').textContent=t.tag;
-    var ph=document.getElementById('tmPhoto');ph.src=t.photo;ph.alt=t.name;
+    var ph=document.getElementById('tmPhoto');ph.src=asset(t.photo);ph.alt=t.name;
     document.getElementById('tmLabel').querySelector('small').textContent=t.name+' 선생님 사진';
     document.getElementById('tmSections').innerHTML=
       block('강의 특징',t.points)+block('학력',t.edu)+block('약력',t.career)+block('저서',t.books);
@@ -928,13 +894,41 @@
       window.addEventListener('load',function(){sec.scrollIntoView({block:'center'});});
     }
   })();
-  // hero slider (콴다일로식 인디케이터 + 좌우 버튼)
+  // hero slider (콴다일로식 인디케이터 + 좌우 버튼) — 배너 데이터: data/banners.json
   (function(){
     var track=document.getElementById('heroTrack');
     var dotsWrap=document.getElementById('heroDots');
     var prevBtn=document.getElementById('heroPrev');
     var nextBtn=document.getElementById('heroNext');
     if(!track||!dotsWrap)return;
+    fetch('data/banners.json',{cache:'no-cache'})
+      .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+      .then(function(d){render((d&&d.items)||[]);})
+      .catch(function(err){console.error('배너 데이터를 불러오지 못했습니다',err);});
+    function render(items){
+      items=items.filter(function(it){return it&&it.image;});
+      items.forEach(function(it,k){
+        var fig=document.createElement('figure');
+        fig.className='slide';
+        fig.setAttribute('aria-label',(k+1)+' / '+items.length);
+        var img=document.createElement('img');
+        img.src=it.image.replace(/^\//,'');
+        img.alt=it.alt||'';
+        var wrap=fig;
+        if(it.link){
+          var a=document.createElement('a');
+          a.className='slide-link';
+          a.href=it.link;
+          if(it.label)a.setAttribute('aria-label',it.label);
+          fig.appendChild(a);
+          wrap=a;
+        }
+        wrap.appendChild(img);
+        track.appendChild(fig);
+      });
+      if(items.length)init();
+    }
+    function init(){
     var slides=[].slice.call(track.querySelectorAll('.slide'));
     var n=slides.length,i=0,timer=null,TOUCH_MS=5000;
     function go(to){
@@ -969,13 +963,19 @@
       if(swiped){e.preventDefault();e.stopPropagation();swiped=false;}
     },true);
     go(0);restart();
+    }
   })();
   // reveal
   (function(){
     var els=[].slice.call(document.querySelectorAll('.reveal'));
-    if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});return;}
+    if(!('IntersectionObserver' in window)){
+      window.observeReveal=function(e){e.classList.add('in');};
+      els.forEach(window.observeReveal);return;
+    }
     var io=new IntersectionObserver(function(ents){ents.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{threshold:.12});
-    els.forEach(function(e){io.observe(e);});
+    // 데이터 파일을 읽어 나중에 그리는 카드도 같은 등장 효과를 받게 한다
+    window.observeReveal=function(e){io.observe(e);};
+    els.forEach(window.observeReveal);
   })();
 </script>
 </body>

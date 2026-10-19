@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "category": "공지",
+      "title": "개설반 안내",
+      "image": "/images/blog1.png",
+      "alt": "학교별 개설반 안내",
+      "link": "ban-guide.html"
+    },
+    {
+      "category": "학습정보",
+      "title": "내신 대비 이렇게 준비하세요",
+      "image": "/images/blog2.png",
+      "alt": "상위권 맞춤 내신 대비 — 제스트에듀 수미T",
+      "link": "naesin.html"
+    },
+    {
+      "category": "성적 발표",
+      "title": "상일고1 전교 1·3등 배출!",
+      "image": "/images/grades-sangil-cover.png",
+      "alt": "상일고1 1학기 전교 1·3등 배출 — 제스트에듀",
+      "link": "classroom.html"
+    }
+  ]
+}

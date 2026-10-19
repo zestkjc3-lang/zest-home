@@ -1,0 +1,87 @@
+# Sveltia CMS 설정 — https://zestedu.co.kr/admin
+# 로그인: GitHub Fine-grained 토큰 (zest-home 저장소, Contents: Read and write)
+backend:
+  name: github
+  repo: zestkjc3-lang/zest-home
+  branch: main
+
+media_folder: images     # 업로드한 사진이 저장되는 저장소 폴더
+public_folder: /images   # 사이트에서 사진을 부르는 경로
+
+collections:
+  - name: home
+    label: 메인 페이지
+    files:
+      - name: banners
+        label: 메인 배너
+        file: data/banners.json
+        format: json
+        fields:
+          - name: items
+            label: 배너 (위에서부터 순서대로 표시)
+            label_singular: 배너
+            widget: list
+            summary: "{{fields.alt}}"
+            fields:
+              - name: image
+                label: 사진
+                widget: image
+                hint: 가로 사진 권장 (약 1024 × 716 비율). 비율이 다르면 가운데 기준으로 잘려 보입니다.
+              - name: alt
+                label: 사진 설명
+                widget: string
+                hint: 사진에 적힌 핵심 문구. 화면에 보이지는 않지만 검색·시각장애인 안내에 쓰입니다.
+              - name: link
+                label: 클릭 시 이동할 페이지
+                widget: string
+                required: false
+                hint: 예) jungwon.html — 비워 두면 클릭해도 이동하지 않습니다.
+              - name: label
+                label: 링크 설명
+                widget: string
+                required: false
+                hint: 예) 중원고 성과 상세 보기
+
+      - name: posts
+        label: 공지 · 블로그 카드
+        file: data/posts.json
+        format: json
+        fields:
+          - name: items
+            label: 카드 (위에서부터 순서대로 표시)
+            label_singular: 카드
+            widget: list
+            summary: "[{{fields.category}}] {{fields.title}}"
+            fields:
+              - { name: category, label: 분류, widget: string, hint: "예) 공지, 학습정보, 성적 발표" }
+              - { name: title, label: 제목, widget: string }
+              - { name: image, label: 사진, widget: image, hint: 정사각형 사진 권장 }
+              - { name: alt, label: 사진 설명, widget: string, required: false }
+              - name: link
+                label: 클릭 시 이동할 주소
+                widget: string
+                hint: "예) ban-guide.html 또는 https://blog.naver.com/zestedu/... (외부 주소는 새 창으로 열림)"
+
+      - name: teachers
+        label: 강사진
+        file: data/teachers.json
+        format: json
+        fields:
+          - name: items
+            label: 강사 (위에서부터 순서대로 표시)
+            label_singular: 강사
+            widget: list
+            summary: "{{fields.name}} — {{fields.role}}"
+            fields:
+              - { name: id, label: 영문 아이디, widget: string, hint: "다른 강사와 겹치지 않는 영문 소문자. 예) kim" }
+              - { name: name, label: 이름, widget: string, hint: "예) 김상학 (뒤에 T는 자동으로 붙음)" }
+              - { name: role, label: 직함, widget: string, hint: "예) 중·고등 영어 전문강사" }
+              - { name: subject, label: 담당, widget: string, required: false }
+              - { name: photo, label: 프로필 사진, widget: image, hint: "세로 사진, 배경이 깔끔한 것" }
+              - { name: badge, label: 사진 위 배지, widget: string, hint: "예) 대표강사" }
+              - { name: card, label: 한 줄 소개, widget: string, required: false }
+              - { name: tag, label: 프로필 창 문구, widget: string, hint: "프로필 창 상단에 나오는 인용 문구" }
+              - { name: points, label: 강의 특징, widget: list, required: false }
+              - { name: edu, label: 학력, widget: list, required: false }
+              - { name: career, label: 약력, widget: list, required: false }
+              - { name: books, label: 저서, widget: list, required: false }
