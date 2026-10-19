@@ -4,7 +4,9 @@
       "image": "/images/jungwon-hero-wide.jpg",
       "alt": "2026학년도 1학기 중원고 영어 성과 — 전교 1등 3명, 제스트에듀 박지유T",
       "link": "jungwon.html",
-      "label": "중원고 1학기 영어 성과 상세 보기"
+      "label": "중원고 1학기 영어 성과 상세 보기",
+      "bg": "#1c1a15",
+      "sx": 1.03
     },
     {
       "image": "/images/hero-slide-2.png",
@@ -36,7 +38,8 @@
       "link": "",
       "label": "",
       "bg": "#fefaf9",
-      "fit": "contain"
+      "fit": "contain",
+      "sx": 1.42
     }
   ]
 }
