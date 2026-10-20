@@ -12,10 +12,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-  /* 명예의 전당 원본 글꼴 「공체」 = G마켓 산스 (무료 상업용) */
-  @font-face{font-family:'GmarketSansLight';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansLight.woff') format('woff');}
-  @font-face{font-family:'GmarketSansMedium';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');}
-  @font-face{font-family:'GmarketSansBold';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff') format('woff');}
+  /* 명예의 전당 원본 글꼴 「공체」 = 공고딕(Gong Gothic, 이사만루 무료 글꼴) */
+  @font-face{font-family:'GongGothic';font-weight:300;src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.0/GongGothicLight.woff') format('woff');}
+  @font-face{font-family:'GongGothic';font-weight:500;src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.0/GongGothicMedium.woff') format('woff');}
+  @font-face{font-family:'GongGothic';font-weight:700;src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.0/GongGothicBold.woff') format('woff');}
+  /* 세로 상장 점수·학교·이름 원본 글꼴 「나눔명조 에코 굵게」 (네이버 무료 글꼴) */
+  @font-face{font-family:'NanumMyeongjoEco';font-weight:700;src:url('https://cdn.jsdelivr.net/npm/@kfonts/nanum-myeongjo-eco@0.2.0/NanumMyeongjoEcoBold.woff2') format('woff2');}
   :root{--ink:#1c1a15;--muted:#6b6558;--line:#e3ddcf;--bg:#f6f3ec;--paper:#fff;--gold:#b99a57;--blue:#2f6fed;--red:#d9480f;--green:#2b8a3e}
   *{box-sizing:border-box}
   html,body{margin:0}
@@ -92,6 +94,12 @@
   .card .meta{display:flex;align-items:center;gap:6px;padding:8px 10px;font-size:13px;border-top:1px solid var(--line)}
   .card .meta span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
   .card .meta button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;font-size:12.5px;font-weight:700}
+  .out{margin-bottom:26px;padding:12px;border-radius:14px;border:2px solid transparent}
+  .out.current{border-color:rgba(47,111,237,.35);background:rgba(47,111,237,.04)}
+  .out-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .out-title{font-size:15px;cursor:pointer}
+  .out-head .spacer{flex:1}
+  .out-head .btn{padding:7px 12px;font-size:13.5px}
   .empty{border:2px dashed var(--line);border-radius:14px;padding:50px 20px;text-align:center;color:var(--muted);line-height:1.7}
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;z-index:50;max-width:calc(100% - 32px)}
   @media (max-width:900px){
@@ -149,10 +157,10 @@
     <div class="main-head">
       <span class="count" id="countText">미리보기</span>
       <span class="spacer"></span>
-      <button class="btn hidden" type="button" id="pdfBtn">PDF로 한 번에 (인쇄용)</button>
       <button class="btn btn-primary" type="button" id="zipBtn" disabled>전체 다운로드 (ZIP)</button>
     </div>
-    <div class="grid" id="grid"></div>
+    <div class="empty" id="emptyMsg">왼쪽에서 디자인을 고르고 명단을 입력하면<br>세로 상장 · 성적 발표 · 축하 배너가 모두 여기에 한꺼번에 만들어져요.</div>
+    <div id="outputs"></div>
   </main>
 </div>
 <div class="toast hidden" id="toast"></div>
@@ -162,25 +170,39 @@
   var BG='../images/certificates/';
   // 글자 위치·크기는 미리캔버스 원본을 재서 맞춘 값 (단위: 결과 이미지 픽셀)
   var GOLD_DARK=['#8a7d4f','#6a6037','#4f4826','#6b6239','#8f8352'];   // 세로 상장 점수: 어두운 올리브 금색
+  // 세로 상장: 미리캔버스 원본 화면에서 뽑은 색 (위→아래)
+  var CERT_EXAM=['#c8b57a','#98825a'],CERT_TOP=['#9a8852','#66522c'],CERT_BOT=['#86784c','#6a5533'];
+  // 각 줄 [가운데 x, 가운데 y, 글자 크기] — 미리캔버스 원본 화면을 겹쳐 놓고 잉크 위치·크기를 재서 맞춘 값
+  var CERT={exam:[1070,1072,94],note:[1047,1323,218],score:[1046,1594,192],school:[1046,1847,132],name:[1046,2020,132]};
   var INK_DARK=['#5f5842','#433e2d','#3a3627','#4d4733'];               // 세로 상장 학교·이름
+  // 성적 발표 시험명: 원본 화면에서 줄마다 뽑은 금색 (가운데가 가장 밝음)
+  var HONOR_EXAM=[[0,'#d2b765'],[.19,'#d5b760'],[.33,'#e8dca5'],[.4,'#f0eac0'],[.47,'#dfce93'],[.54,'#d7bb6d'],[.61,'#c1a458'],[.75,'#a68e4d'],[.88,'#c2a767'],[1,'#c8ad6c']];
   var GOLD_LIGHT=['#fff6d5','#f1d58c','#d4a94f','#b88a35','#f3dc9c'];
+  // 축하 배너: 원본 화면에서 줄마다 뽑은 금색 [위치, 색]
+  var BANNER_EXAM=[[0,'#b79c4e'],[.14,'#b39f5d'],[.29,'#c7c08a'],[.43,'#d3bb6d'],[.57,'#c19f49'],[.71,'#bb9943'],[.86,'#aa8837'],[1,'#95762a']];
+  var BANNER_SCORE=[[0,'#e6cc78'],[.084,'#f2dc83'],[.168,'#f4ea9e'],[.251,'#f9f8ba'],[.34,'#e2d090'],[.419,'#d6b36b'],[.503,'#c18d44'],[.587,'#ab7b36'],[.67,'#926527'],[.749,'#795018'],[.838,'#997239'],[.916,'#bb965b'],[1,'#c9a86c']];
+  var BANNER_NAME=[[0,'#c7ac57'],[.156,'#e6db92'],[.26,'#e3e0a7'],[.364,'#c8b276'],[.44,'#d6b36d'],[.565,'#a57736'],[.669,'#7f5823'],[.773,'#7b541e'],[.825,'#916a33'],[.922,'#b49159'],[1,'#d5b175']];
   var GOLD_METAL=['#fff4cc','#f1d48a','#cfa04a','#8f6926','#c9a457'];  // 축하 배너: 아래쪽이 어두운 금속 금색
   var DESIGNS={
     certificate:{
       label:'세로 상장',sub:'18×26cm 인쇄용',bg:BG+'certificate-bg.png',w:2040,h:2949,card:'190px',
       file:'상장',perPage:1,pdf:{w:180,h:260},
       draw:function(ctx,row,exam){
-        var serif='"Nanum Myeongjo", serif';
-        text(ctx,exam,1032,999,{family:serif,weight:800,size:88,spacing:.21,fill:'#9a7b3e'});
+        // 원본: 시험명 = 나눔명조 ExtraBold, 나머지 = 나눔명조 에코 굵게 · 자간 16 · 장평 99% · 검은 외곽선(글자 크기의 2.5%)
+        // 색은 글상자 하나에 위→아래 그라데이션 하나 (「점수 위 문구+점수」 한 상자, 「학교+이름」 한 상자)
+        var serif='"Nanum Myeongjo", serif',eco='NanumMyeongjoEco, "Nanum Myeongjo", serif',P=CERT;
+        text(ctx,exam,P.exam[0],P.exam[1],{family:serif,weight:800,size:P.exam[2],spacing:.16,fill:CERT_EXAM,grad:[P.exam[1]-46,P.exam[1]+46]});
+        var o=function(size,g){return {family:eco,weight:700,size:size,spacing:.16,stretch:.99,stroke:['#000',.025],fill:g[0],grad:g[1]};};
+        var line=function(t,q,g){text(ctx,t,q[0],q[1],o(q[2],g));};
         if(row.note){
-          text(ctx,row.note,1030,1280,{family:serif,weight:800,size:219,spacing:.1,stretch:1.1,fill:GOLD_DARK});
-          text(ctx,score(row.score),1030,1562,{family:serif,weight:800,size:192,spacing:.1,stretch:1.1,fill:GOLD_DARK});
-          text(ctx,row.school,1030,1818,{family:serif,weight:800,size:120,spacing:.1,stretch:1.15,fill:INK_DARK});
-          text(ctx,row.name,1030,1998,{family:serif,weight:800,size:120,spacing:.1,stretch:1.15,fill:INK_DARK});
+          var g1=[CERT_TOP,[P.note[1]-106,P.score[1]+93]],g2=[CERT_BOT,[P.school[1]-64,P.name[1]+65]];
+          line(row.note,P.note,g1);line(score(row.score),P.score,g1);
+          line(row.school,P.school,g2);line(row.name,P.name,g2);
         }else{
-          text(ctx,score(row.score),1030,1337,{family:serif,weight:800,size:234,spacing:.1,stretch:1.1,fill:GOLD_DARK});
-          text(ctx,row.school,1030,1610,{family:serif,weight:800,size:150,spacing:.1,stretch:1.15,fill:INK_DARK});
-          text(ctx,row.name,1030,1829,{family:serif,weight:800,size:150,spacing:.1,stretch:1.15,fill:INK_DARK});
+          // 「점수 위 문구」가 없을 때: 점수를 더 크게, 아래 두 줄도 조금 크게 (원본 비율 유지)
+          var s0=[1046,1400,250],s1=[1040,1700,148],s2=[1041,1895,148];
+          var h1=[CERT_TOP,[s0[1]-120,s0[1]+120]],h2=[CERT_BOT,[s1[1]-72,s2[1]+72]];
+          line(score(row.score),s0,h1);line(row.school,s1,h2);line(row.name,s2,h2);
         }
       }
     },
@@ -188,12 +210,12 @@
       label:'성적 발표',sub:'명예의 전당 (최대 24명)',bg:BG+'honor-bg.jpg',w:1365,h:1365,card:'340px',
       file:'성적발표',perPage:24,sortable:true,
       draw:function(ctx,rows,exam){
-        text(ctx,exam,686,134,{family:'GmarketSansBold, sans-serif',weight:400,size:73,spacing:0,fill:GOLD_LIGHT,shadow:'rgba(0,0,0,.55)'});
+        text(ctx,exam,713.5,135.5,{family:'GongGothic, sans-serif',weight:500,size:72.4,spacing:0,fill:HONOR_EXAM,shadow:'rgba(0,0,0,.55)'});
         rows.forEach(function(r,i){
           var col=i<12?0:1,row=i%12,y=450+row*62.8;
           var sx=col?702:190,nx=col?1015:471;
-          text(ctx,score(r.score),sx,y,{family:'GmarketSansBold, sans-serif',weight:400,size:41,spacing:0,fill:'#3a2a0c',align:'left'});
-          text(ctx,r.school+' '+r.name,nx,y,{family:'GmarketSansLight, sans-serif',weight:400,size:38.5,spacing:0,fill:'#3a2a0c'});
+          text(ctx,score(r.score),sx,y,{family:'GongGothic, sans-serif',weight:700,size:40.3,spacing:0,fill:'#3a2a0c',align:'left'});
+          text(ctx,r.school+' '+r.name,nx,y,{family:'GongGothic, sans-serif',weight:300,size:40.3,spacing:0,fill:'#3a2a0c'});
         });
       }
     },
@@ -202,14 +224,18 @@
       file:'축하배너',perPage:1,
       draw:function(ctx,row,exam){
         var sans='Pretendard, sans-serif';
-        text(ctx,exam,960,386,{family:sans,weight:400,size:45,spacing:.12,fill:'#ecd9a6'});
-        text(ctx,score(row.score),960,575,{family:sans,weight:500,size:213,spacing:-.035,fill:GOLD_METAL});
-        text(ctx,row.school,960,716,{family:sans,weight:500,size:80,spacing:.03,fill:GOLD_METAL});
-        text(ctx,row.name,960,804,{family:sans,weight:500,size:80,spacing:.06,fill:GOLD_METAL});
+        // 색: 미리캔버스 원본 화면에서 줄마다 뽑은 금색. 학교·이름은 한 글상자라 그라데이션 하나로 이어진다
+        text(ctx,exam,962,386,{family:sans,weight:400,size:45,spacing:.147,fill:BANNER_EXAM,grad:[366,401]});
+        // 원본 「210 산토리니L」(유료 글꼴)은 옆으로 넓은 글꼴이라, 프리텐다드를 같은 높이로 두고 가로로 21% 넓혀 맞춘다
+        text(ctx,score(row.score),964,573,{family:sans,weight:500,size:208,spacing:-.035,stretch:1.21,fill:BANNER_SCORE,grad:[470,649]});
+        text(ctx,row.school,960,716,{family:sans,weight:600,size:80,spacing:.01,fill:BANNER_NAME,grad:[678,832]});
+        text(ctx,row.name,960,804,{family:sans,weight:600,size:80,spacing:.04,fill:BANNER_NAME,grad:[678,832]});
       }
     }
   };
   var ORDER=['certificate','honor','banner'];
+  // 원본 겹쳐 보기(검수)용으로 그리기 함수를 밖에서 쓸 수 있게 둔다
+  window.__cert={DESIGNS:DESIGNS,CERT:CERT,text:text,loadBg:function(s){return loadBg(s);},ready:function(){return fontsReady;}};
   var $=function(id){return document.getElementById(id);};
   var design='certificate',rows=[],pages=[],bgCache={},renderToken=0;
 
@@ -224,12 +250,23 @@
     var st=o.stretch||1,sp=(o.spacing||0)*o.size,chars=Array.from(str),widths=chars.map(function(c){return ctx.measureText(c).width*st;});
     var total=widths.reduce(function(a,b){return a+b;},0)+sp*(chars.length-1);
     var x=o.align==='left'?cx:cx-total/2;
-    if(Array.isArray(o.fill)){
-      var g=ctx.createLinearGradient(0,cy-o.size*.5,0,cy+o.size*.5);
-      o.fill.forEach(function(c,i){g.addColorStop(i/(o.fill.length-1),c);});
-      ctx.fillStyle=g;
-    }else ctx.fillStyle=o.fill;
+    // 장평(stretch)으로 글자를 옆으로 늘릴 때는 글자 자리로 좌표를 옮겨 그리므로, 그라데이션도 그만큼(-cy) 옮겨 만든다
+    var paint=function(dy){
+      if(!Array.isArray(o.fill))return o.fill;
+      // grad:[위,아래] 를 주면 여러 줄이 한 상자처럼 이어지는 그라데이션 (미리캔버스 글상자와 같게)
+      var y0=o.grad?o.grad[0]:cy-o.size*.5,y1=o.grad?o.grad[1]:cy+o.size*.5;
+      var g=ctx.createLinearGradient(0,y0-dy,0,y1-dy);
+      o.fill.forEach(function(c,i){if(Array.isArray(c))g.addColorStop(c[0],c[1]);else g.addColorStop(i/(o.fill.length-1),c);});  // [위치,색] 으로 줄 수도 있음
+      return g;
+    };
+    ctx.fillStyle=paint(st===1?0:cy);
     if(o.shadow){ctx.shadowColor=o.shadow;ctx.shadowBlur=o.size*.12;ctx.shadowOffsetY=o.size*.04;}
+    // 외곽선: 글자 뒤에 깔아서 바깥쪽 절반만 보이게 (미리캔버스 「효과 › 외곽선」과 같은 방식)
+    if(o.stroke){ctx.save();ctx.shadowColor='transparent';ctx.strokeStyle=o.stroke[0];ctx.lineWidth=o.stroke[1]*o.size;ctx.lineJoin='round';
+      var sx0=x;chars.forEach(function(c,i){
+        if(st===1)ctx.strokeText(c,sx0,cy);else{ctx.save();ctx.translate(sx0,cy);ctx.scale(st,1);ctx.strokeText(c,0,0);ctx.restore();}
+        sx0+=widths[i]+sp;});
+      ctx.restore();}
     chars.forEach(function(c,i){
       if(st===1)ctx.fillText(c,x,cy);
       else{ctx.save();ctx.translate(x,cy);ctx.scale(st,1);ctx.fillText(c,0,0);ctx.restore();}
@@ -243,7 +280,7 @@
     return bgCache[src];
   }
   var fontsReady=Promise.all([
-    '800 100px "Nanum Myeongjo"','400 100px Pretendard','500 100px Pretendard','100px GmarketSansLight','100px GmarketSansMedium','100px GmarketSansBold','700 100px Pretendard','800 100px Pretendard'
+    '800 100px "Nanum Myeongjo"','400 100px Pretendard','500 100px Pretendard','600 100px Pretendard','700 100px NanumMyeongjoEco','300 100px GongGothic','500 100px GongGothic','700 100px GongGothic','700 100px Pretendard','800 100px Pretendard'
   ].map(function(f){return document.fonts.load(f,'가나다0123점');})).catch(function(){});
 
   // ----- 명단 읽기 -----
@@ -292,7 +329,7 @@
       var e=entries[i];if(!e)return;tr.classList.toggle('bad',isBad(e));
       tr.querySelectorAll('input').forEach(function(inp){var k=inp.getAttribute('data-k');inp.classList.toggle('miss',(k==='score'||k==='name')&&!String(e[k]).trim());});
     });
-    persist();updateCounts();render();
+    persist();updateCounts();render(design);
   }
   function updateCounts(){
     [].forEach.call(document.querySelectorAll('#designs button'),function(b){
@@ -362,8 +399,8 @@
     if(entries.some(filled)&&!confirm('「'+DESIGNS[design].label+'」 명단을 모두 지울까요?'))return;
     entries.length=0;ensureRows(entries);drawRoster(0,0);syncRows();
   });
-  $('examInput').addEventListener('input',function(){clearTimeout(typingTimer);typingTimer=setTimeout(function(){persist();render();},250);});
-  $('sortInput').addEventListener('change',render);
+  $('examInput').addEventListener('input',function(){clearTimeout(typingTimer);typingTimer=setTimeout(function(){persist();render(design);},250);});
+  $('sortInput').addEventListener('change',function(){render('honor');});
   $('fileInput').addEventListener('change',function(){
     var f=this.files&&this.files[0];if(!f)return;
     var fr=new FileReader();
@@ -387,35 +424,36 @@
     var b=document.createElement('button');
     b.type='button';b.setAttribute('data-k',k);
     b.innerHTML='<img alt="" src="'+d.bg+'"><div>'+d.label+'</div><div style="font-weight:500;font-size:11.5px">'+d.sub+'</div><span class="cnt"></span>';
-    b.addEventListener('click',function(){
-      if(k===design)return;
-      persist();design=k;entries=STATE[k].entries;$('examInput').value=STATE[k].exam;
-      syncDesign();drawRoster();syncRows();
-    });
+    b.addEventListener('click',function(){selectDesign(k);});
     $('designs').appendChild(b);
   });
+  function selectDesign(k){
+    if(k===design)return;
+    persist();design=k;entries=STATE[k].entries;$('examInput').value=STATE[k].exam;
+    syncDesign();drawRoster();syncRows();
+    ORDER.forEach(function(x){$('out-'+x).classList.toggle('current',x===design);});
+  }
   function syncDesign(){
     [].forEach.call(document.querySelectorAll('#designs button'),function(b){b.setAttribute('aria-pressed',b.getAttribute('data-k')===design?'true':'false');});
     var d=DESIGNS[design];
-    $('grid').style.setProperty('--card',d.card);
     $('sortRow').classList.toggle('hidden',!d.sortable);
     $('noteHint').classList.toggle('hidden',design!=='certificate');
     $('roster').classList.toggle('show-note',design==='certificate');
-    $('pdfBtn').classList.toggle('hidden',!d.pdf);
   }
 
-  // ----- 그리기 -----
-  function pageList(){
-    var d=DESIGNS[design];
-    if(d.perPage===1)return rows.map(function(r){return {rows:r,name:[score(r.score),r.school,r.name].join('_')};});
-    var list=rows.slice();
-    if($('sortInput').checked)list.sort(function(a,b){return (parseFloat(b.score)||0)-(parseFloat(a.score)||0);});
+  // ----- 그리기 (오른쪽에 모든 디자인을 한꺼번에) -----
+  function rowsOf(k){return validRows(k===design?entries:STATE[k].entries);}
+  function examOf(k){return (k===design?$('examInput').value:STATE[k].exam).trim();}
+  function pageList(k){
+    var d=DESIGNS[k],list=rowsOf(k);
+    if(d.perPage===1)return list.map(function(r){return {rows:r,name:[score(r.score),r.school,r.name].join('_')};});
+    if($('sortInput').checked)list=list.slice().sort(function(a,b){return (parseFloat(b.score)||0)-(parseFloat(a.score)||0);});
     var out=[];
     for(var i=0;i<list.length;i+=d.perPage)out.push({rows:list.slice(i,i+d.perPage),name:(out.length+1)+'장'});
     return out;
   }
-  function drawPage(canvas,page){
-    var d=DESIGNS[design],exam=$('examInput').value.trim();
+  function drawPage(canvas,page,k){
+    var d=DESIGNS[k],exam=examOf(k);
     return Promise.all([loadBg(d.bg),fontsReady]).then(function(r){
       canvas.width=d.w;canvas.height=d.h;
       var ctx=canvas.getContext('2d');
@@ -424,30 +462,43 @@
       return canvas;
     });
   }
-  function render(){
-    var token=++renderToken,d=DESIGNS[design];
-    pages=pageList();
-    var grid=$('grid');grid.innerHTML='';
-    $('zipBtn').disabled=!pages.length;$('pdfBtn').disabled=!pages.length;
-    $('countText').textContent=pages.length?(d.label+' '+pages.length+'장'):'미리보기';
-    if(!pages.length){
-      grid.innerHTML='<div class="empty">명단을 입력하면<br>여기에 '+d.label+'이(가) 한 장씩 만들어져요.</div>';
-      return;
-    }
+  var PAGES={},tokens={};
+  // 디자인마다 칸(제목 + 버튼 + 카드 격자)을 하나씩 만든다
+  ORDER.forEach(function(k){
+    var d=DESIGNS[k],sec=document.createElement('section');sec.className='out';sec.id='out-'+k;
+    sec.innerHTML='<div class="out-head"><b class="out-title"></b><span class="spacer"></span>'+
+      (d.pdf?'<button class="btn" type="button" data-act="pdf">PDF로 한 번에 (인쇄용)</button>':'')+
+      '<button class="btn" type="button" data-act="zip">이 디자인만 ZIP</button></div><div class="grid"></div>';
+    sec.querySelector('.grid').style.setProperty('--card',d.card);
+    sec.querySelector('.out-title').addEventListener('click',function(){selectDesign(k);});
+    sec.querySelector('[data-act="zip"]').addEventListener('click',function(){zipDesigns([k],this);});
+    if(d.pdf)sec.querySelector('[data-act="pdf"]').addEventListener('click',function(){pdfDesign(k,this);});
+    $('outputs').appendChild(sec);
+  });
+  function render(k){
+    if(!k){ORDER.forEach(render);return;}
+    var token=tokens[k]=(tokens[k]||0)+1,d=DESIGNS[k],pages=PAGES[k]=pageList(k);
+    var sec=$('out-'+k),grid=sec.querySelector('.grid');grid.innerHTML='';
+    sec.classList.toggle('hidden',!pages.length);sec.classList.toggle('current',k===design);
+    sec.querySelector('.out-title').textContent=d.label+' '+pages.length+'장'+(examOf(k)?' · '+examOf(k):'');
     pages.forEach(function(p,i){
       var card=document.createElement('div');card.className='card';
       var cv=document.createElement('canvas');cv.width=d.w;cv.height=d.h;
       var meta=document.createElement('div');meta.className='meta';
       var label=document.createElement('span');label.textContent=(i+1)+'. '+p.name.replace(/_/g,' ');
       var dl=document.createElement('button');dl.type='button';dl.textContent='저장';
-      dl.addEventListener('click',function(){saveOne(cv,fileName(p,i));});
+      dl.addEventListener('click',function(){saveOne(cv,fileName(k,p,i));});
       meta.appendChild(label);meta.appendChild(dl);
       card.appendChild(cv);card.appendChild(meta);grid.appendChild(card);
-      drawPage(cv,p).then(function(){if(token!==renderToken)return;});
+      drawPage(cv,p,k).then(function(){if(token!==tokens[k])return;});
     });
+    var total=ORDER.reduce(function(n,x){return n+((PAGES[x]||[]).length);},0);
+    $('zipBtn').disabled=!total;
+    $('countText').textContent=total?'전체 '+total+'장':'미리보기';
+    $('emptyMsg').classList.toggle('hidden',!!total);
   }
-  function fileName(p,i){
-    var d=DESIGNS[design],safe=function(s){return String(s).replace(/[\\\/:*?"<>|]/g,'').trim();};
+  function fileName(k,p,i){
+    var d=DESIGNS[k],safe=function(s){return String(s).replace(/[\\\/:*?"<>|]/g,'').trim();};
     return safe(d.file+'_'+(d.perPage===1?p.name:(i+1)+'장'))+'.png';
   }
   function blobOf(cv,type,q){return new Promise(function(res){cv.toBlob(res,type||'image/png',q);});}
@@ -458,45 +509,51 @@
   function saveOne(cv,name){blobOf(cv).then(function(b){saveBlob(b,name);});}
   function busy(btn,on,label){btn.disabled=on;btn.textContent=label;}
 
-  $('zipBtn').addEventListener('click',function(){
-    var btn=this,d=DESIGNS[design],zip=new JSZip(),i=0;
-    busy(btn,true,'만드는 중… 0/'+pages.length);
+  // ZIP: 여러 디자인이면 디자인마다 폴더로 나눠 담는다
+  function zipDesigns(keys,btn){
+    var label=btn.textContent,jobs=[];
+    keys.forEach(function(k){(PAGES[k]||[]).forEach(function(p,i){jobs.push([k,p,i]);});});
+    if(!jobs.length)return;
+    var zip=new JSZip(),i=0,many=keys.filter(function(k){return (PAGES[k]||[]).length;}).length>1;
+    busy(btn,true,'만드는 중… 0/'+jobs.length);
     (function next(){
-      if(i>=pages.length){
+      if(i>=jobs.length){
         zip.generateAsync({type:'blob'}).then(function(b){
-          saveBlob(b,d.file+'_'+$('examInput').value.trim().replace(/\s+/g,'')+'.zip');
-          busy(btn,false,'전체 다운로드 (ZIP)');toast(pages.length+'장을 ZIP 파일 하나로 저장했어요.');
+          var k0=keys.length===1?keys[0]:null;
+          saveBlob(b,(k0?DESIGNS[k0].file+'_'+examOf(k0).replace(/\s+/g,''):'상장_전체')+'.zip');
+          busy(btn,false,label);toast(jobs.length+'장을 ZIP 파일 하나로 저장했어요.');
         });
         return;
       }
-      var cv=document.createElement('canvas'),p=pages[i],name=fileName(p,i);
-      drawPage(cv,p).then(function(){return blobOf(cv);}).then(function(b){zip.file(name,b);i++;btn.textContent='만드는 중… '+i+'/'+pages.length;next();});
+      var j=jobs[i],cv=document.createElement('canvas'),name=fileName(j[0],j[1],j[2]);
+      drawPage(cv,j[1],j[0]).then(function(){return blobOf(cv);}).then(function(b){zip.file((many?DESIGNS[j[0]].label+'/':'')+name,b);i++;btn.textContent='만드는 중… '+i+'/'+jobs.length;next();});
     })();
-  });
+  }
+  $('zipBtn').addEventListener('click',function(){zipDesigns(ORDER,this);});
 
-  $('pdfBtn').addEventListener('click',function(){
-    var btn=this,d=DESIGNS[design];if(!d.pdf)return;
+  function pdfDesign(k,btn){
+    var d=DESIGNS[k],pages=PAGES[k]||[],label=btn.textContent;if(!d.pdf||!pages.length)return;
     var pdf=new jspdf.jsPDF({unit:'mm',format:[d.pdf.w,d.pdf.h],orientation:'portrait'}),i=0;
     busy(btn,true,'만드는 중… 0/'+pages.length);
     (function next(){
       if(i>=pages.length){
-        pdf.save(d.file+'_'+$('examInput').value.trim().replace(/\s+/g,'')+'.pdf');
-        busy(btn,false,'PDF로 한 번에 (인쇄용)');toast(pages.length+'장을 PDF 한 파일로 저장했어요.');
+        pdf.save(d.file+'_'+examOf(k).replace(/\s+/g,'')+'.pdf');
+        busy(btn,false,label);toast(pages.length+'장을 PDF 한 파일로 저장했어요.');
         return;
       }
       var cv=document.createElement('canvas');
-      drawPage(cv,pages[i]).then(function(){
+      drawPage(cv,pages[i],k).then(function(){
         if(i>0)pdf.addPage([d.pdf.w,d.pdf.h],'portrait');
         pdf.addImage(cv.toDataURL('image/jpeg',.95),'JPEG',0,0,d.pdf.w,d.pdf.h);
         i++;btn.textContent='만드는 중… '+i+'/'+pages.length;setTimeout(next,0);
       });
     })();
-  });
+  }
 
   var toastTimer;
   function toast(t){var el=$('toast');el.textContent=t;el.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.add('hidden');},3500);}
 
-  $('examInput').value=STATE[design].exam;syncDesign();drawRoster();syncRows();
+  $('examInput').value=STATE[design].exam;syncDesign();drawRoster();syncRows();render();
 })();
 </script>
 </body>
