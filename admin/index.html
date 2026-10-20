@@ -53,6 +53,8 @@
   .preview{padding:16px;min-height:0;display:flex;justify-content:center;background:#e9e4d8}
   .frame-wrap{width:100%;height:100%;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px -18px rgba(0,0,0,.4);transition:width .2s}
   .frame-wrap.mobile{width:390px}
+  .frame-wrap{position:relative}
+  .frame-back{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:3;border:0;border-radius:999px;background:var(--ink);color:#fff;font-weight:700;font-size:14px;padding:9px 16px;box-shadow:0 8px 20px -8px rgba(0,0,0,.5);cursor:pointer}
   .frame-wrap iframe{width:100%;height:100%;border:0;display:block}
   .panel{background:var(--paper);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
   .tabs{display:flex;border-bottom:1px solid var(--line)}
@@ -212,6 +214,7 @@
   <div class="main">
     <div class="preview">
       <div class="frame-wrap" id="frameWrap">
+        <button type="button" class="frame-back hidden" id="frameBack">← 홈페이지 미리보기로</button>
         <iframe id="frame" title="홈페이지 미리보기"></iframe>
       </div>
     </div>
@@ -234,7 +237,8 @@
 
     <h3>✏️ 고치기</h3>
     <ol>
-      <li>홈페이지 화면(미리보기)에서 바꾸고 싶은 <b>배너 · 공지 카드 · 강사 카드</b>를 누르세요. 오른쪽 목록의 「✏️ 수정」을 눌러도 돼요.</li>
+      <li>홈페이지 화면(미리보기)에서 바꾸고 싶은 <b>배너 · 공지 카드 · 강사 카드의 「✏️ 수정」 버튼</b>을 누르세요. 오른쪽 목록의 「✏️ 수정」을 눌러도 돼요.</li>
+      <li>버튼이 아닌 곳을 누르면 <b>실제 홈페이지처럼 이동</b>해요(상세 페이지·글·강사 프로필). 다른 페이지로 갔다면 위의 「← 홈페이지 미리보기로」로 돌아와요.</li>
       <li>오른쪽에 수정 칸이 열려요. 글자를 고치면 미리보기에 바로 반영돼요.</li>
       <li>다 고쳤으면 오른쪽 위 초록색 <b>「저장하기」</b>를 누르세요. 1~2분 뒤 홈페이지에 반영돼요.</li>
     </ol>
@@ -431,6 +435,20 @@
   // ---------- 미리보기 연결 ----------
   function send(msg){ if(frameReady)$('frame').contentWindow.postMessage(msg,location.origin); }
   function pushSection(name){ if(previewKey==='home'&&name!=='articles')send({type:'zest-data',section:name,items:data[name]}); }
+  // 미리보기 안에서 다른 페이지로 이동하면 돌아오기 버튼을 보여 준다.
+  // 홈(index.html)으로 돌아왔는데 편집 표시가 빠졌으면 다시 편집 미리보기로 연다
+  $('frame').addEventListener('load',function(){
+    var loc;try{loc=$('frame').contentWindow.location;}catch(e){loc=null;}
+    if(!loc)return;
+    var isHome=/\/(index\.html)?$/.test(loc.pathname),isEdit=/[?&]edit=1/.test(loc.search);
+    if(isHome&&!isEdit&&previewKey==='home'){frameReady=false;$('frame').src='../index.html?edit=1'+loc.hash;return;}
+    $('frameBack').classList.toggle('hidden',isEdit);
+  });
+  $('frameBack').addEventListener('click',function(){
+    frameReady=false;
+    var a=previewKey.indexOf('post:')===0?previewKey.slice(5):'';
+    $('frame').src=a?'../post.html?id='+encodeURIComponent(a)+'&edit=1':'../index.html?edit=1';
+  });
   // 글을 쓰는 동안에는 미리보기를 글 페이지(post.html)로 바꾼다
   var previewKey='home';
   function sendArticle(){ if(previewKey.indexOf('post:')===0)send({type:'zest-article',article:articleById(previewKey.slice(5))}); }
@@ -446,6 +464,7 @@
     if(e.data.type==='zest-ready'){frameReady=true;if(e.data.page==='post')sendArticle();else Object.keys(SECTIONS).forEach(pushSection);}
     if(e.data.type==='zest-edit'){openItem(e.data.section,e.data.index);}
     if(e.data.type==='zest-add'&&SECTIONS[e.data.section]){addItem(e.data.section);}
+    if(e.data.type==='zest-need-article'){var a=articleById(e.data.id);if(a)$('frame').contentWindow.postMessage({type:'zest-article',article:a},location.origin);}
   });
   [].forEach.call(document.querySelectorAll('[data-device]'),function(b){
     b.addEventListener('click',function(){
@@ -482,7 +501,7 @@
     syncPreview();
     if(editing>=0&&items[editing]){renderForm(body,sec,items[editing]);return;}
     var tip=el('div',{'class':'tip'});
-    tip.innerHTML='<ol><li>홈페이지 화면에서 <b>고칠 곳을 누르세요</b> (또는 아래 「수정」)</li><li>오른쪽에서 사진·글을 고치세요</li><li>다 되면 위의 <b>「저장하기」</b></li></ol>';
+    tip.innerHTML='<ol><li>홈페이지 화면에서 고칠 곳의 <b>「✏️ 수정」 버튼</b>을 누르세요 (또는 아래 「수정」)</li><li>오른쪽에서 사진·글을 고치세요</li><li>다 되면 위의 <b>「저장하기」</b></li></ol><div style="margin-top:6px;font-size:13px">미리보기는 실제 홈페이지와 똑같이 눌러서 이동해 볼 수 있어요.</div>';
     body.appendChild(tip);
     if(sec.tip)body.appendChild(el('div',{'class':'hint',style:'color:var(--muted);font-size:13px;margin:-4px 0 12px',text:sec.tip}));
     items.forEach(function(it,k){

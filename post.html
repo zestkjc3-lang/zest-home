@@ -179,10 +179,20 @@
     window.parent.postMessage({type:'zest-ready',page:'post'},location.origin);
     return;
   }
+  // 관리자 화면 미리보기 안에서 카드·배너를 눌러 온 경우: 아직 저장 안 한 글도 관리자 화면에서 받아 보여 준다
+  var fromAdmin=false,inAdmin=false;
+  try{inAdmin=window.parent!==window&&window.parent.location.origin===location.origin&&/\/admin\//.test(window.parent.location.pathname);}catch(e){}
+  if(inAdmin){
+    window.addEventListener('message',function(e){
+      if(e.origin!==location.origin||e.source!==window.parent||!e.data)return;
+      if(e.data.type==='zest-article'&&e.data.article){fromAdmin=true;render(e.data.article);}
+    });
+    window.parent.postMessage({type:'zest-need-article',id:id},location.origin);
+  }
   fetch('data/articles.json',{cache:'no-cache'})
     .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
-    .then(function(d){render(((d&&d.items)||[]).filter(function(a){return a.id===id;})[0]);})
-    .catch(function(){render(null);});
+    .then(function(d){if(!fromAdmin)render(((d&&d.items)||[]).filter(function(a){return a.id===id;})[0]);})
+    .catch(function(){if(!fromAdmin)render(null);});
 })();
 </script>
 </body>

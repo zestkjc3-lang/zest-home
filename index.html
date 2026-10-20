@@ -749,6 +749,8 @@
   // /admin 편집 화면의 미리보기(iframe ?edit=1)일 때만 true
   var EDIT_MODE=window.parent!==window&&/[?&]edit=1/.test(location.search);
   var POST_MAX=6;
+  // 편집 미리보기: 관리자 화면이 보낸(저장 전) 내용이 있으면, 늦게 도착한 저장본으로 덮어쓰지 않는다
+  var EDITED={};
   // 관리자 화면에서 입력한 글자가 HTML 태그로 해석되지 않게 바꾼다
   function esc(v){
     return String(v==null?'':v).replace(/[&<>"']/g,function(c){
@@ -776,7 +778,7 @@
   function loadData(name,cb){
     fetch('data/'+name+'.json',{cache:'no-cache'})
       .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
-      .then(function(d){cb((d&&d.items)||[]);})
+      .then(function(d){if(EDITED[name])return;cb((d&&d.items)||[]);})
       .catch(function(err){console.error('data/'+name+'.json 을 불러오지 못했습니다',err);});
   }
 
@@ -1036,37 +1038,42 @@
     var parentWin=window.parent,origin=location.origin;
     var st=document.createElement('style');
     st.textContent=
-      '[data-edit]{position:relative;cursor:pointer!important}'+
+      '[data-edit]{position:relative}'+
       '[data-edit]:hover{outline:3px solid #2f6fed;outline-offset:3px}'+
-      '[data-edit]::after{content:"✏️ 눌러서 수정";position:absolute;top:10px;left:10px;z-index:5;background:#2f6fed;color:#fff;font-size:13px;font-weight:700;padding:5px 10px;border-radius:999px;pointer-events:none;opacity:0;transition:opacity .15s}'+
-      '[data-edit]:hover::after,[data-edit].zest-selected::after{opacity:1}'+
       '[data-edit].zest-selected{outline:3px solid #f08c00;outline-offset:3px}'+
+      '.zest-edit-btn{position:absolute;top:10px;left:10px;z-index:6;border:0;border-radius:999px;background:#2f6fed;color:#fff;font:700 13px/1 Pretendard,sans-serif;padding:7px 11px;cursor:pointer;box-shadow:0 4px 12px -4px rgba(0,0,0,.45)}'+
+      '.zest-edit-btn:hover{background:#1f57c9}'+
       '.post-add{min-height:220px;border:3px dashed #c9bfa6;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#8a8170;cursor:pointer;background:rgba(255,255,255,.5)}'+
       '.post-add span{font-size:40px;line-height:1}.post-add b{font-size:16px}'+
       '.post-add:hover{border-color:#2f6fed;color:#2f6fed;background:#f5f8ff}'+
       '.reveal{opacity:1!important;transform:none!important}';
     document.head.appendChild(st);
     if(heroSlider)heroSlider.setAutoplay(false);
-    // 미리보기 안에서는 링크로 이동하지 않고, 수정할 항목만 골라 편집 화면에 알린다
+    // 배너·카드·강사마다 「✏️ 수정」 버튼을 붙인다. 버튼 말고 다른 곳을 누르면 실제 홈페이지처럼 이동한다
+    function decorate(){
+      [].forEach.call(document.querySelectorAll('[data-edit]'),function(el){
+        if(el.querySelector(':scope > .zest-edit-btn'))return;
+        var b=document.createElement('button');b.type='button';b.className='zest-edit-btn';b.textContent='✏️ 수정';
+        el.appendChild(b);
+      });
+    }
+    decorate();
+    new MutationObserver(decorate).observe(document.body,{childList:true,subtree:true});
     document.addEventListener('click',function(e){
       var add=e.target.closest('[data-add]');
       if(add){e.preventDefault();e.stopPropagation();parentWin.postMessage({type:'zest-add',section:add.getAttribute('data-add')},origin);return;}
-      var hit=e.target.closest('[data-edit]');
-      var nav=e.target.closest('.hero-nav,.hero-dots button');
-      if(nav&&!hit)return;
-      if(hit){
+      var btn=e.target.closest('.zest-edit-btn');
+      if(btn){
         e.preventDefault();e.stopPropagation();
-        var parts=hit.getAttribute('data-edit').split(':');
+        var parts=btn.parentNode.getAttribute('data-edit').split(':');
         parentWin.postMessage({type:'zest-edit',section:parts[0],index:+parts[1]},origin);
-        return;
       }
-      if(e.target.closest('a'))e.preventDefault();
     },true);
     var renderers={banners:heroSlider&&heroSlider.render,posts:renderPosts,teachers:renderTeachers};
     window.addEventListener('message',function(e){
       if(e.origin!==origin||e.source!==parentWin||!e.data)return;
       var d=e.data;
-      if(d.type==='zest-data'&&renderers[d.section])renderers[d.section](d.items);
+      if(d.type==='zest-data'&&renderers[d.section]){EDITED[d.section]=true;renderers[d.section](d.items);}
       if(d.type==='zest-focus'){
         [].forEach.call(document.querySelectorAll('.zest-selected'),function(x){x.classList.remove('zest-selected');});
         var el=document.querySelector('[data-edit="'+d.section+':'+d.index+'"]');
