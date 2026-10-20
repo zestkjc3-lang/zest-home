@@ -244,7 +244,7 @@
 
     <h3>✍️ 글 쓰기 · 글 고치기 (카드·배너를 누르면 열리는 글)</h3>
     <ol>
-      <li>미리보기에서 카드·배너를 눌러 글로 들어간 뒤 글 왼쪽 위 <b>「✏️ 이 글 수정」</b>을 누르세요. 또는 배너·공지 카드 목록에서 <b>「📝 글」</b> 버튼. 새 글은 카드·배너 수정 칸의 <b>「✏️ 새 글 쓰고 여기에 연결하기」</b>로 만들어요.</li>
+      <li>미리보기에서 <b>공지 카드나 배너 사진을 누르면</b> 연결된 글로 이동해요. 글 위에 마우스를 올리면 <b>「눌러서 수정」</b>이 나와요. 카드·배너 사진·제목을 고치려면 그 위에 마우스를 올려 같은 버튼을 누르세요. 아직 글이 없는 카드는 수정 칸의 <b>「새 글 쓰고 연결하기」</b>로 만들어요.</li>
       <li>왼쪽 미리보기가 <b>글 화면</b>으로 바뀌어요. 글자를 바로 눌러서 고치면 돼요.</li>
       <li>위쪽 도구 막대: <b>글씨체 · 크기 · 굵게 · 색 · 형광펜 · 정렬 · 목록 · 소제목 · 링크 · 구분선 · 📷 사진 · 🧩 디자인 상자</b>(번호 카드, 단계 상자, 강조 상자, 사진 2칸 등).</li>
       <li>사진을 누르면 <b>작게 · 중간 · 원래 크기 · 사진 바꾸기 · 지우기</b>가 나와요. 사진 파일을 복사해서 붙여넣어도 돼요.</li>
@@ -284,8 +284,7 @@
       fields:[
         {key:'image',label:'배너 사진',type:'image',hint:'가로 사진 권장 (약 1024 × 716 비율).'},
         {key:'fit',label:'사진 맞춤',type:'fit',ratio:'1024/716'},
-        {key:'alt',label:'사진 설명',type:'text',hint:'사진에 적힌 핵심 문구. 화면엔 안 보이지만 검색·음성 안내에 쓰여요.'},
-        {key:'link',label:'누르면 이동할 페이지',type:'link'}
+        {key:'alt',label:'사진 설명',type:'text',hint:'사진에 적힌 핵심 문구. 화면엔 안 보이지만 검색·음성 안내에 쓰여요.'}
       ],
       blank:function(){return {image:'',alt:'',link:'',label:''};}
     },
@@ -299,8 +298,7 @@
         {key:'image',label:'카드 사진',type:'image',hint:'정사각형 사진 권장.'},
         {key:'fit',label:'사진 맞춤',type:'fit',ratio:'1/1'},
         {key:'category',label:'분류',type:'text',hint:'예) 공지, 학습정보, 성적 발표'},
-        {key:'title',label:'제목',type:'text'},
-        {key:'link',label:'누르면 이동할 페이지',type:'link',hint:'블로그 글은 「다른 주소 직접 입력」을 고르고 주소를 붙여넣으세요. 새 창으로 열려요.'}
+        {key:'title',label:'제목',type:'text'}
       ],
       blank:function(){return {category:'공지',title:'',image:'',alt:'',link:''};}
     },
@@ -687,6 +685,17 @@
       if(f.hint)box.appendChild(el('span',{'class':'hint',text:f.hint}));
       body.appendChild(box);
     });
+    if((name==='banners'||name==='posts')&&String(it.link||'').indexOf(ARTICLE_LINK)!==0){
+      body.appendChild(el('div',{'class':'field'},[
+        el('button',{type:'button','class':'btn',text:'✏️ 새 글 쓰고 연결하기',on:{click:function(){
+          var a=SECTIONS.articles.blank();
+          a.title=it.title||it.alt||'새 글';a.html=articleTemplate(it.image||'',a.title);
+          data.articles.push(a);it.link=ARTICLE_LINK+a.id;
+          changed(name);changed('articles');goArticle(a.id);
+        }}}),
+        el('span',{'class':'hint',text:'연결되면 미리보기에서 카드나 배너를 눌러 그 글로 이동해요.'})
+      ]));
+    }
     body.appendChild(el('div',{'class':'form-foot'},[
       el('button',{type:'button','class':'btn btn-danger',text:'이 '+sec.label+' 삭제',on:{click:function(){removeItem(name,idx);}}}),
       el('button',{type:'button','class':'btn',text:'완료',on:{click:back}})

@@ -222,10 +222,10 @@ main{max-width:var(--maxw);margin:0 auto;padding:20px 16px 56px}
     });
     window.parent.postMessage({type:'zest-need-article',id:id},origin);
     // 홈페이지 미리보기처럼 글 왼쪽 위에 「✏️ 수정」 버튼 → 누르면 이 글 편집으로 바뀐다
-    var eb=document.createElement('button');eb.type='button';eb.className='zest-edit-btn';eb.textContent='✏️ 이 글 수정';
+    var eb=document.createElement('button');eb.type='button';eb.className='zest-edit-btn';eb.textContent='눌러서 수정';
     eb.addEventListener('click',function(){window.parent.postMessage({type:'zest-article-open',id:id},origin);});
     var st=document.createElement('style');
-    st.textContent='.zest-edit-anchor{position:relative;height:0}.zest-edit-btn{position:absolute;top:10px;left:10px;z-index:30;border:0;border-radius:999px;background:#2f6fed;color:#fff;font:700 13px/1 Pretendard,sans-serif;padding:8px 12px;cursor:pointer;box-shadow:0 4px 12px -4px rgba(0,0,0,.45)}.zest-edit-btn:hover{background:#1f57c9}';
+    st.textContent='main{position:relative}.zest-edit-anchor{position:absolute;top:14px;left:14px;z-index:30;opacity:0;pointer-events:none}.zest-edit-btn{border:0;border-radius:999px;background:#2f6fed;color:#fff;font:700 13px/1 Pretendard,sans-serif;padding:8px 12px;cursor:pointer;box-shadow:0 4px 12px -4px rgba(0,0,0,.45)}main:hover{outline:3px solid #2f6fed;outline-offset:3px}main:hover .zest-edit-anchor,main:focus-within .zest-edit-anchor{opacity:1;pointer-events:auto}.zest-edit-btn:hover{background:#1f57c9}';
     document.head.appendChild(st);
     var anchor=document.createElement('div');anchor.className='zest-edit-anchor';anchor.appendChild(eb);content.before(anchor);
   }

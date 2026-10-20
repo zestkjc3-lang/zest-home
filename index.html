@@ -1041,7 +1041,8 @@
       '[data-edit]{position:relative}'+
       '[data-edit]:hover{outline:3px solid #2f6fed;outline-offset:3px}'+
       '[data-edit].zest-selected{outline:3px solid #f08c00;outline-offset:3px}'+
-      '.zest-edit-btn{position:absolute;top:10px;left:10px;z-index:6;border:0;border-radius:999px;background:#2f6fed;color:#fff;font:700 13px/1 Pretendard,sans-serif;padding:7px 11px;cursor:pointer;box-shadow:0 4px 12px -4px rgba(0,0,0,.45)}'+
+      '.zest-edit-btn{position:absolute;top:10px;left:10px;z-index:6;border:0;border-radius:999px;background:#2f6fed;color:#fff;font:700 13px/1 Pretendard,sans-serif;padding:7px 11px;cursor:pointer;box-shadow:0 4px 12px -4px rgba(0,0,0,.45);opacity:0;pointer-events:none}'+
+      '[data-edit]:hover>.zest-edit-btn,[data-edit]:focus-within>.zest-edit-btn{opacity:1;pointer-events:auto}'+
       '.zest-edit-btn:hover{background:#1f57c9}'+
       '.post-add{min-height:220px;border:3px dashed #c9bfa6;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#8a8170;cursor:pointer;background:rgba(255,255,255,.5)}'+
       '.post-add span{font-size:40px;line-height:1}.post-add b{font-size:16px}'+
@@ -1053,7 +1054,7 @@
     function decorate(){
       [].forEach.call(document.querySelectorAll('[data-edit]'),function(el){
         if(el.querySelector(':scope > .zest-edit-btn'))return;
-        var b=document.createElement('button');b.type='button';b.className='zest-edit-btn';b.textContent='✏️ 수정';
+        var b=document.createElement('button');b.type='button';b.className='zest-edit-btn';b.textContent='눌러서 수정';
         el.appendChild(b);
       });
     }
