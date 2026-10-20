@@ -125,6 +125,24 @@
   .photo input{display:none}
   .form-foot{display:flex;justify-content:space-between;gap:8px;margin-top:8px;padding-top:14px;border-top:1px solid var(--line)}
 
+  .blocks{display:flex;flex-direction:column;gap:10px}
+  .blk{border:1px solid var(--line);border-radius:12px;background:#faf8f3;padding:10px}
+  .blk-head{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+  .blk-head b{flex:1;font-size:13px;color:var(--muted)}
+  .blk-head button{border:1px solid var(--line);background:#fff;border-radius:8px;height:28px;padding:0 8px;font-size:12.5px;font-weight:700}
+  .blk-head .del{color:var(--red)}
+  .blk textarea{min-height:120px}
+  .blk .tools{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;align-items:center}
+  .blk .tools button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 10px;font-size:13px}
+  .blk .tools small{color:var(--muted);font-size:12px}
+  .blk .shot{display:block;width:100%;max-height:200px;object-fit:contain;background:#f1ece1;border-radius:8px}
+  .blk .pick{display:inline-block;margin:8px 0;font-weight:700;color:var(--blue);cursor:pointer;font-size:14px}
+  .blk .pick input{display:none}
+  .add-blocks{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+  .add-blocks button{border:1.5px dashed var(--line);background:#fff;border-radius:10px;padding:8px 10px;font-weight:700;color:var(--muted);font-size:13px}
+  .add-blocks button:hover{border-color:var(--gold);color:var(--ink)}
+  .link-actions{margin-top:8px}
+  .link-actions button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-weight:700;color:var(--blue);font-size:14px}
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;z-index:50;max-width:calc(100% - 32px);box-shadow:0 12px 30px -12px rgba(0,0,0,.5)}
   .toast.err{background:var(--red)}
   .toast.ok{background:var(--green)}
@@ -202,6 +220,7 @@
         <button type="button" role="tab" data-tab="banners" aria-selected="true">메인 배너</button>
         <button type="button" role="tab" data-tab="posts" aria-selected="false">공지 카드</button>
         <button type="button" role="tab" data-tab="teachers" aria-selected="false">강사진</button>
+        <button type="button" role="tab" data-tab="articles" aria-selected="false">✍️ 글 쓰기</button>
       </nav>
       <div class="panel-body" id="panelBody"></div>
     </aside>
@@ -232,6 +251,14 @@
       <li>오른쪽 목록에서 왼쪽 <b>⠿ 손잡이를 잡고 위아래로 끌어다 놓으세요.</b></li>
       <li>맨 위에 있는 것이 홈페이지에서도 첫 번째로 보여요.</li>
     </ul>
+
+    <h3>✍️ 글 쓰기 (카드·배너를 누르면 열리는 글)</h3>
+    <ol>
+      <li>카드나 배너 수정 칸의 「누르면 이동할 페이지」 아래 <b>「✏️ 새 글 쓰고 여기에 연결하기」</b>를 누르세요. (위의 「✍️ 글 쓰기」 탭에서 먼저 써도 돼요)</li>
+      <li>미리보기가 <b>글 페이지</b>로 바뀌어요. 제목, 대표 사진, 본문을 쓰면 바로 보여요.</li>
+      <li>본문은 「+ 문단」, 「+ 사진」, 「+ 소제목」 같은 버튼으로 하나씩 쌓아요. 글자를 드래그하고 「굵게」, 「형광펜」을 누르면 꾸밀 수 있어요.</li>
+      <li>이미 쓴 글은 「누르면 이동할 페이지」 목록의 <b>「✍️ 내가 쓴 글」</b>에서 골라 연결할 수 있어요.</li>
+    </ol>
 
     <h3>➕ 추가 · 🗑 삭제</h3>
     <ul>
@@ -310,8 +337,30 @@
         {key:'books',label:'저서',type:'lines'}
       ],
       blank:function(){return {id:'t'+Date.now().toString(36),name:'',role:'',subject:'',photo:'',badge:'',card:'',tag:'',points:[],edu:[],career:[],books:[]};}
+    },
+    articles:{label:'글',file:'data/articles.json',optional:true,
+      required:[['title','제목']],
+      tip:'공지 카드나 배너를 눌렀을 때 열리는 글이에요. 블로그처럼 사진과 글을 자유롭게 써요. 글을 다 쓰면 카드·배너의 「누르면 이동할 페이지」에서 이 글을 고르세요.',
+      title:function(it){return it.title||'(제목 없음)';},
+      sub:function(it){var n=linkers(it.id).length;return (it.eyebrow?it.eyebrow+' · ':'')+(n?'카드·배너 '+n+'곳에 연결됨':'아직 연결 안 됨');},
+      thumb:'cover',
+      fields:[
+        {key:'cover',label:'맨 위 대표 사진',type:'image',hint:'없어도 돼요. 카드 사진과 같은 사진을 써도 좋아요.'},
+        {key:'eyebrow',label:'작은 제목 (분류)',type:'text',hint:'제목 위에 작게 나와요. 예) 중원고1 · 박지유T'},
+        {key:'title',label:'제목',type:'text'},
+        {key:'blocks',label:'본문',type:'blocks'},
+        {key:'blog',label:'블로그 원문 주소 (선택)',type:'text',hint:'넣으면 글 맨 아래에 「블로그 원문 보기」 버튼이 생겨요.'}
+      ],
+      blank:function(){return {id:'a'+Date.now().toString(36),title:'',eyebrow:'',cover:'',blocks:[{t:'p',text:''}],blog:''};}
     }
   };
+  var ARTICLE_LINK='post.html?id=';
+  function articleById(id){return (data.articles||[]).filter(function(a){return a.id===id;})[0];}
+  function linkers(id){
+    var out=[];
+    ['banners','posts'].forEach(function(n){(data[n]||[]).forEach(function(it,k){if(it.link===ARTICLE_LINK+id)out.push([n,k]);});});
+    return out;
+  }
 
   var token='', data={}, saved={}, fileSha={}, uploads={}, tab='banners', editing=-1, frameReady=false;
   var $=function(id){return document.getElementById(id);};
@@ -342,6 +391,9 @@
       fileSha[name]=f.sha;
       data[name]=(JSON.parse(b64ToText(f.content)).items)||[];
       saved[name]=JSON.stringify(data[name]);
+    }).catch(function(err){
+      if(err.status===404&&SECTIONS[name].optional){fileSha[name]=null;data[name]=[];saved[name]='[]';return;}
+      throw err;
     });
   }
 
@@ -378,10 +430,20 @@
 
   // ---------- 미리보기 연결 ----------
   function send(msg){ if(frameReady)$('frame').contentWindow.postMessage(msg,location.origin); }
-  function pushSection(name){ send({type:'zest-data',section:name,items:data[name]}); }
+  function pushSection(name){ if(previewKey==='home'&&name!=='articles')send({type:'zest-data',section:name,items:data[name]}); }
+  // 글을 쓰는 동안에는 미리보기를 글 페이지(post.html)로 바꾼다
+  var previewKey='home';
+  function sendArticle(){ if(previewKey.indexOf('post:')===0)send({type:'zest-article',article:articleById(previewKey.slice(5))}); }
+  function syncPreview(){
+    var a=tab==='articles'&&editing>=0&&data.articles[editing];
+    var k=a?'post:'+a.id:'home';
+    if(k===previewKey)return;
+    previewKey=k;frameReady=false;
+    $('frame').src=a?'../post.html?id='+encodeURIComponent(a.id)+'&edit=1':'../index.html?edit=1';
+  }
   window.addEventListener('message',function(e){
     if(e.origin!==location.origin||e.source!==$('frame').contentWindow||!e.data)return;
-    if(e.data.type==='zest-ready'){frameReady=true;Object.keys(SECTIONS).forEach(pushSection);}
+    if(e.data.type==='zest-ready'){frameReady=true;if(e.data.page==='post')sendArticle();else Object.keys(SECTIONS).forEach(pushSection);}
     if(e.data.type==='zest-edit'){openItem(e.data.section,e.data.index);}
     if(e.data.type==='zest-add'&&SECTIONS[e.data.section]){addItem(e.data.section);}
   });
@@ -406,7 +468,7 @@
     (kids||[]).forEach(function(c){if(c)n.appendChild(c);});
     return n;
   }
-  function changed(name){ pushSection(name); updateDirty(); }
+  function changed(name){ if(name==='articles')sendArticle(); else pushSection(name); updateDirty(); }
 
   function openItem(name,index){
     tab=name;editing=index;renderPanel();
@@ -417,6 +479,7 @@
     [].forEach.call(document.querySelectorAll('[data-tab]'),function(b){b.setAttribute('aria-selected',b.getAttribute('data-tab')===tab?'true':'false');});
     var body=$('panelBody');body.innerHTML='';
     var sec=SECTIONS[tab],items=data[tab]||[];
+    syncPreview();
     if(editing>=0&&items[editing]){renderForm(body,sec,items[editing]);return;}
     var tip=el('div',{'class':'tip'});
     tip.innerHTML='<ol><li>홈페이지 화면에서 <b>고칠 곳을 누르세요</b> (또는 아래 「수정」)</li><li>오른쪽에서 사진·글을 고치세요</li><li>다 되면 위의 <b>「저장하기」</b></li></ol>';
@@ -445,8 +508,10 @@
     data[name].push(sec.blank());changed(name);openItem(name,data[name].length-1);
   }
   function removeItem(name,k){
-    var sec=SECTIONS[name],it=data[name][k];
-    if(!confirm('「'+sec.title(it)+'」을(를) 삭제할까요?\n저장하기 전까지는 「되돌리기」로 복구할 수 있어요.'))return;
+    var sec=SECTIONS[name],it=data[name][k],links=name==='articles'?linkers(it.id):[];
+    var warn=links.length?'\n이 글에 연결된 카드·배너 '+links.length+'곳은 「이동하지 않음」으로 바뀌어요.':'';
+    if(!confirm('「'+sec.title(it)+'」을(를) 삭제할까요?'+warn+'\n저장하기 전까지는 「되돌리기」로 복구할 수 있어요.'))return;
+    links.forEach(function(l){data[l[0]][l[1]].link='';changed(l[0]);});
     data[name].splice(k,1);editing=-1;changed(name);renderPanel();
   }
   // 끌어다 놓기로 순서 바꾸기 (마우스·터치 모두)
@@ -510,6 +575,8 @@
         if(it[f.key])acts.appendChild(el('a',{href:imgSrc(it[f.key]),download:downloadName(it[f.key],sec.title(it)),text:'사진 다운로드'}));
         pic.appendChild(acts);
         box.appendChild(pic);
+      }else if(f.type==='blocks'){
+        box.appendChild(blocksEditor(name,it));
       }else if(f.type==='fit'){
         box.appendChild(fitEditor(name,it,f.ratio));
       }else if(f.type==='lines'){
@@ -518,10 +585,18 @@
         box.appendChild(ta);
         f.hint=f.hint||'한 줄에 하나씩 적어요.';
       }else if(f.type==='link'){
-        var cur=it[f.key]||'',known=PAGES.some(function(p){return p[0]===cur;});
+        var cur=it[f.key]||'',arts=data.articles||[];
+        var known=PAGES.some(function(p){return p[0]===cur;})||arts.some(function(a){return ARTICLE_LINK+a.id===cur;});
         var sel=el('select',{});
         sel.appendChild(el('option',{value:'',text:'이동하지 않음'}));
-        PAGES.forEach(function(p){sel.appendChild(el('option',{value:p[0],text:p[1]+' 페이지'}));});
+        if(arts.length){
+          var g1=el('optgroup',{label:'✍️ 내가 쓴 글'});
+          arts.forEach(function(a){g1.appendChild(el('option',{value:ARTICLE_LINK+a.id,text:a.title||'(제목 없음)'}));});
+          sel.appendChild(g1);
+        }
+        var g2=el('optgroup',{label:'홈페이지 페이지'});
+        PAGES.forEach(function(p){g2.appendChild(el('option',{value:p[0],text:p[1]+' 페이지'}));});
+        sel.appendChild(g2);
         sel.appendChild(el('option',{value:'__custom',text:'블로그 등 다른 주소 직접 입력…'}));
         sel.value=!cur?'':known?cur:'__custom';
         var url=el('input',{type:'text','class':'sub-input',placeholder:'https://blog.naver.com/zestedu/...'});
@@ -536,6 +611,16 @@
         });
         url.addEventListener('input',function(){it[f.key]=url.value.trim();changed(name);});
         box.appendChild(sel);box.appendChild(url);
+        // 글 연결: 연결된 글이 있으면 편집, 없으면 새로 쓰고 연결
+        var linkedId=cur.indexOf(ARTICLE_LINK)===0?cur.slice(ARTICLE_LINK.length):'';
+        box.appendChild(el('div',{'class':'link-actions'},[linkedId&&articleById(linkedId)?
+          el('button',{type:'button',text:'✏️ 연결된 글 편집하기',on:{click:function(){goArticle(linkedId);}}}):
+          el('button',{type:'button',text:'✏️ 새 글 쓰고 여기에 연결하기',on:{click:function(){
+            var a=SECTIONS.articles.blank();
+            a.title=it.title||it.alt||'';a.cover=it.image||'';
+            data.articles.push(a);it[f.key]=ARTICLE_LINK+a.id;
+            changed(name);changed('articles');goArticle(a.id);
+          }}})]));
       }else{
         var inp=el('input',{type:'text'});inp.value=it[f.key]||'';
         inp.addEventListener('input',function(){
@@ -550,10 +635,7 @@
       body.appendChild(box);
     });
     body.appendChild(el('div',{'class':'form-foot'},[
-      el('button',{type:'button','class':'btn btn-danger',text:'이 '+sec.label+' 삭제',on:{click:function(){
-        if(!confirm('이 '+sec.label+'을(를) 삭제할까요? 저장하기 전까지는 되돌릴 수 있어요.'))return;
-        items.splice(idx,1);editing=-1;changed(name);renderPanel();
-      }}}),
+      el('button',{type:'button','class':'btn btn-danger',text:'이 '+sec.label+' 삭제',on:{click:function(){removeItem(name,idx);}}}),
       el('button',{type:'button','class':'btn',text:'완료',on:{click:function(){editing=-1;renderPanel();}}})
     ]));
   }
@@ -652,8 +734,80 @@
     paint();
     return wrap;
   }
+  // ---------- 글 본문 편집기: 소제목·문단·사진·강조 문구·목록·강조 상자를 위에서부터 쌓는다 ----------
+  var BLOCK_TYPES=[['h','소제목'],['p','문단'],['img','사진'],['quote','강조 문구'],['list','목록'],['note','강조 상자']];
+  function blockLabel(t){for(var i=0;i<BLOCK_TYPES.length;i++)if(BLOCK_TYPES[i][0]===t)return BLOCK_TYPES[i][1];return t;}
+  function blocksEditor(name,it){
+    if(!Array.isArray(it.blocks))it.blocks=[];
+    var wrap=el('div',{'class':'blocks'});
+    function draw(focusIdx){
+      wrap.innerHTML='';
+      it.blocks.forEach(function(b,i){wrap.appendChild(blockBox(b,i));});
+      var row=el('div',{'class':'add-blocks'});
+      BLOCK_TYPES.forEach(function(t){
+        row.appendChild(el('button',{type:'button',text:'+ '+t[1],on:{click:function(){
+          var b={t:t[0]};if(t[0]==='list')b.items=[];else if(t[0]==='img'){b.src='';b.caption='';}else b.text='';
+          it.blocks.push(b);changed(name);draw(it.blocks.length-1);
+        }}}));
+      });
+      wrap.appendChild(row);
+      if(focusIdx!=null){var f=wrap.querySelectorAll('.blk')[focusIdx];if(f){var inp=f.querySelector('textarea,input[type=text]');if(inp)inp.focus();f.scrollIntoView({block:'nearest'});}}
+    }
+    function move(i,d){var j=i+d;if(j<0||j>=it.blocks.length)return;var t=it.blocks[i];it.blocks[i]=it.blocks[j];it.blocks[j]=t;changed(name);draw();}
+    function wrapSel(ta,mark,b){
+      var s=ta.selectionStart,e=ta.selectionEnd;
+      if(s===e){toast('먼저 꾸밀 글자를 마우스로 드래그해서 고르세요.');return;}
+      ta.setRangeText(mark+ta.value.slice(s,e)+mark,s,e,'end');b.text=ta.value;changed(name);ta.focus();
+    }
+    function blockBox(b,i){
+      var box=el('div',{'class':'blk'});
+      box.appendChild(el('div',{'class':'blk-head'},[
+        el('b',{text:(i+1)+'. '+blockLabel(b.t)}),
+        el('button',{type:'button',title:'위로',text:'↑',on:{click:function(){move(i,-1);}}}),
+        el('button',{type:'button',title:'아래로',text:'↓',on:{click:function(){move(i,1);}}}),
+        el('button',{type:'button','class':'del',text:'삭제',on:{click:function(){it.blocks.splice(i,1);changed(name);draw();}}})
+      ]));
+      if(b.t==='img'){
+        if(b.src)box.appendChild(el('img',{'class':'shot',src:imgSrc(b.src),alt:''}));
+        var input=el('input',{type:'file',accept:'image/png,image/jpeg,image/webp'});
+        input.addEventListener('change',function(){
+          var file=input.files&&input.files[0];if(!file)return;
+          readImage(file).then(function(u){b.src=u;changed(name);draw();}).catch(function(err){toast(err.message,'err');});
+        });
+        box.appendChild(el('label',{'class':'pick'},[document.createTextNode(b.src?'📷 사진 바꾸기':'📷 사진 올리기'),input]));
+        var cap=el('input',{type:'text',placeholder:'사진 설명 (선택) — 사진 아래에 작게 나와요'});cap.value=b.caption||'';
+        cap.addEventListener('input',function(){b.caption=cap.value;changed(name);});
+        box.appendChild(cap);
+      }else if(b.t==='list'){
+        var ta=el('textarea',{placeholder:'한 줄에 하나씩 적어요'});ta.value=(b.items||[]).join('\n');
+        ta.addEventListener('input',function(){b.items=ta.value.split('\n').map(function(x){return x.trim();}).filter(Boolean);changed(name);});
+        box.appendChild(ta);
+      }else if(b.t==='h'||b.t==='quote'){
+        var inp=el('input',{type:'text',placeholder:b.t==='h'?'예) 이번 시험의 3가지 포인트':'예) “어떻게 이런 결과가 나왔을까요?”'});inp.value=b.text||'';
+        inp.addEventListener('input',function(){b.text=inp.value;changed(name);});
+        box.appendChild(inp);
+      }else{
+        var t2=el('textarea',{placeholder:b.t==='note'?'글 마지막에 강조하고 싶은 말을 적어요':'내용을 적어요. 빈 줄을 넣으면 문단이 나뉘어요.'});t2.value=b.text||'';
+        box.appendChild(el('div',{'class':'tools'},[
+          el('button',{type:'button',text:'굵게',style:'font-weight:800',on:{click:function(){wrapSel(t2,'**',b);}}}),
+          el('button',{type:'button',text:'형광펜',style:'background:#ffe56a',on:{click:function(){wrapSel(t2,'==',b);}}}),
+          el('small',{text:'글자를 드래그한 뒤 누르세요'})
+        ]));
+        t2.addEventListener('input',function(){b.text=t2.value;changed(name);});
+        box.appendChild(t2);
+      }
+      return box;
+    }
+    draw();
+    return wrap;
+  }
+  function goArticle(id){
+    var k=(data.articles||[]).map(function(a){return a.id;}).indexOf(id);
+    if(k>=0)openItem('articles',k);
+  }
   function linkText(link){
     if(!link)return '누르면 이동 안 함';
+    if(link.indexOf(ARTICLE_LINK)===0){var a=articleById(link.slice(ARTICLE_LINK.length));return a?'→ 글: '+(a.title||'(제목 없음)'):'→ 글 (삭제됨)';}
     for(var i=0;i<PAGES.length;i++)if(PAGES[i][0]===link)return '→ '+PAGES[i][1]+' 페이지';
     return /^https?:/.test(link)?'→ 외부 주소(블로그 등)':'→ '+link;
   }
@@ -701,7 +855,7 @@
   }
   $('discardBtn').addEventListener('click',function(){
     if(!confirm('저장하지 않은 수정 내용을 모두 되돌릴까요?'))return;
-    Object.keys(SECTIONS).forEach(function(n){data[n]=JSON.parse(saved[n]);pushSection(n);});
+    Object.keys(SECTIONS).forEach(function(n){data[n]=JSON.parse(saved[n]);pushSection(n);});sendArticle();
     editing=-1;renderPanel();updateDirty();
   });
   window.addEventListener('beforeunload',function(e){if(token&&isDirty()){e.preventDefault();e.returnValue='';}});
@@ -726,8 +880,12 @@
     names.forEach(function(n){out[n]=JSON.parse(JSON.stringify(data[n]));});
     // 1) 다른 사람이 먼저 같은 파일을 고쳤는지 확인
     Promise.all(names.map(function(n){
+      var conflict=new Error('다른 곳에서 「'+SECTIONS[n].label+'」 내용을 먼저 수정했어요. 지금 수정한 내용을 메모해 두고 새로고침한 뒤 다시 해 주세요.');
       return gh('/contents/'+SECTIONS[n].file+'?ref='+BRANCH).then(function(f){
-        if(f.sha!==fileSha[n])throw new Error('다른 곳에서 「'+SECTIONS[n].label+'」 내용을 먼저 수정했어요. 지금 수정한 내용을 메모해 두고 새로고침한 뒤 다시 해 주세요.');
+        if(f.sha!==fileSha[n])throw conflict;
+      },function(err){
+        if(err.status===404&&!fileSha[n])return;
+        throw err;
       });
     })).then(function(){
       return gh('/git/ref/heads/'+BRANCH);
@@ -739,17 +897,19 @@
       // 2) 새로 올린 사진을 images/ 에 파일로 만든다
       var jobs=[];
       names.forEach(function(n){
-        out[n].forEach(function(it){
-          ['image','photo'].forEach(function(key){
-            var v=it[key];if(!v||v.indexOf('data:')!==0)return;
-            var m=/^data:image\/(png|jpeg|webp);base64,(.*)$/.exec(v);if(!m)return;
-            var ext=m[1]==='jpeg'?'jpg':m[1],path='images/edit-'+st+'-'+(++seq)+'.'+ext;
-            jobs.push(gh('/git/blobs',{method:'POST',body:{content:m[2],encoding:'base64'}}).then(function(b){
-              entries.push({path:path,mode:'100644',type:'blob',sha:b.sha});
-              it[key]='/'+path;
-            }));
+        (function walk(o){
+          Object.keys(o).forEach(function(key){
+            var v=o[key];
+            if(typeof v==='string'&&v.indexOf('data:image/')===0){
+              var m=/^data:image\/(png|jpeg|webp);base64,(.*)$/.exec(v);if(!m)return;
+              var ext=m[1]==='jpeg'?'jpg':m[1],path='images/edit-'+st+'-'+(++seq)+'.'+ext;
+              jobs.push(gh('/git/blobs',{method:'POST',body:{content:m[2],encoding:'base64'}}).then(function(b){
+                entries.push({path:path,mode:'100644',type:'blob',sha:b.sha});
+                o[key]='/'+path;
+              }));
+            }else if(v&&typeof v==='object')walk(v);
           });
-        });
+        })(out[n]);
       });
       return Promise.all(jobs);
     }).then(function(){
@@ -759,7 +919,7 @@
       });
       return gh('/git/trees',{method:'POST',body:{base_tree:baseTree,tree:entries}});
     }).then(function(tree){
-      var what=names.map(function(n){return {banners:'메인 배너',posts:'공지 카드',teachers:'강사진'}[n];}).join('·');
+      var what=names.map(function(n){return {banners:'메인 배너',posts:'공지 카드',teachers:'강사진',articles:'글'}[n];}).join('·');
       return gh('/git/commits',{method:'POST',body:{message:'관리자 화면에서 '+what+'을(를) 수정한다.',tree:tree.sha,parents:[headSha]}});
     }).then(function(commit){
       return gh('/git/refs/heads/'+BRANCH,{method:'PATCH',body:{sha:commit.sha,force:false}});
