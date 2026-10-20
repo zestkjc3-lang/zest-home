@@ -31,7 +31,7 @@
   .btn:hover{border-color:#cbbf9f}
   .btn-primary{background:var(--green);border-color:var(--green);color:#fff}
   .btn-primary:disabled{background:#a5c9ae;border-color:#a5c9ae;cursor:default}
-  .layout{display:grid;grid-template-columns:400px minmax(0,1fr);gap:0;min-height:calc(100vh - 58px)}
+  .layout{display:grid;grid-template-columns:minmax(520px,46%) minmax(0,1fr);gap:0;min-height:calc(100vh - 58px)}
   .side{background:var(--paper);border-right:1px solid var(--line);padding:18px}
   .step{margin-bottom:22px}
   .step h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
@@ -46,29 +46,32 @@
   .hint b{color:var(--ink)}
   .file{display:inline-block;margin-top:8px;font-size:13.5px;font-weight:700;color:var(--blue);cursor:pointer}
   .file input{display:none}
-  .roster{width:100%;border-collapse:separate;border-spacing:0 6px;table-layout:fixed}
-  .roster th{font-size:12px;color:var(--muted);text-align:left;font-weight:700;padding:0 4px}
-  .roster td{padding:0 2px}
-  .roster input{width:100%;padding:8px 7px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:14px}
-  .roster input:focus{outline:2px solid rgba(47,111,237,.35);border-color:var(--blue)}
-  .roster .n{width:22px;color:var(--muted);font-size:12px;text-align:center;padding:0}
-  .roster .c-score{width:62px}
-  .roster th:last-child{width:26px}
-  .roster .note-col{width:86px}
-  .roster th.note-col{font-size:11px;line-height:1.2}
+  /* 명단: 엑셀처럼 칸이 붙은 격자 */
+  .sheet{border:1px solid #cfcfcf;border-radius:6px;overflow:auto;max-height:62vh;background:#fff}
+  .roster{border-collapse:collapse;width:100%;table-layout:fixed;font-size:14px}
+  .roster th{position:sticky;top:0;z-index:1;background:#f2f2f2;border:1px solid #d6d6d6;font-weight:700;font-size:12.5px;color:#555;padding:6px 8px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .roster td{border:1px solid #e3e3e3;padding:0;height:32px}
+  .roster .n{width:40px;background:#f2f2f2;color:#888;text-align:center;font-size:12px;border-color:#d6d6d6}
+  .roster th.n{text-align:center}
+  .roster .c-score{width:72px}
+  .roster .note-col{width:118px}
+  .roster .d{width:30px}
   .roster:not(.show-note) .note-col{display:none}
-  .roster tr.bad input.miss{border-color:#f0a5a5;background:#fff6f6}
-  .roster .del{border:0;background:none;color:#b3a99a;font-size:15px;padding:4px;width:100%}
+  .roster input{display:block;width:100%;height:31px;border:0;border-radius:0;padding:0 8px;background:transparent;font-size:14px;color:var(--ink)}
+  .roster input:focus{outline:2px solid #217346;outline-offset:-2px;background:#fff}
+  .roster input::placeholder{color:#c9c9c9}
+  .roster tr.bad input.miss{background:#fff0f0}
+  .roster .del{border:0;background:none;color:#bbb;font-size:13px;width:100%;height:31px;opacity:0;cursor:pointer}
+  .roster tr:hover .del,.roster .del:focus{opacity:1}
   .roster .del:hover{color:var(--red)}
-  .roster-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 8px}
-  .roster-acts button,.file-btn{border:1.5px dashed #cbbf9f;background:#fff;border-radius:10px;padding:8px 12px;font-weight:700;font-size:14px;color:var(--ink);cursor:pointer}
-  .roster-acts .ghost{border-style:solid;border-color:var(--line);color:var(--muted)}
+  .roster-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+  .roster-acts button,.file-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;font-weight:700;font-size:13.5px;color:var(--ink);cursor:pointer}
+  .roster-acts .ghost{color:var(--muted)}
   .file-btn input{display:none}
-  .paste-box{display:flex;flex-direction:column;gap:4px;border:2px dashed #cbbf9f;background:#fffdf7;border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer;font-size:13.5px;color:var(--muted);line-height:1.55}
-  .paste-box>b{font-size:15px;color:var(--ink)}
-  .paste-box:hover{border-color:var(--gold)}
-  .paste-box:focus{outline:none;border-color:var(--blue);background:#f2f6ff;box-shadow:0 0 0 3px rgba(47,111,237,.15)}
-  .paste-box:focus>b::after{content:"  ← 이제 ⌘V / Ctrl+V 를 누르세요";color:var(--blue);font-weight:700;font-size:13px}
+  .sheet-tip{font-size:13px;color:var(--muted);margin:0 0 8px;line-height:1.55;background:#eef6f0;border:1px solid #cfe5d6;border-radius:8px;padding:8px 10px}
+  .sheet-tip b{color:#1d5c38}
+  .designs .cnt{display:inline-block;margin-top:3px;font-size:11px;font-weight:800;color:#fff;background:var(--green);border-radius:999px;padding:1px 7px}
+  .designs .cnt:empty{display:none}
   .note-help{margin-top:10px;background:#f7f3ea;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.6;color:var(--muted)}
   .note-help b{color:var(--ink)}
   .note-demo{margin-top:8px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;font-family:"Nanum Myeongjo",serif;font-weight:800;color:#5a5038;display:flex;flex-direction:column;gap:1px}
@@ -114,25 +117,24 @@
     <section class="step field">
       <h2><i>2</i>시험명</h2>
       <input type="text" id="examInput" value="2026년 1학기 기말고사" />
-      <span class="hint">모든 상장에 똑같이 들어가요.</span>
+      <span class="hint">이 디자인의 모든 장에 똑같이 들어가요. 디자인마다 따로 적어 둘 수 있어요.</span>
     </section>
 
     <section class="step field">
-      <h2><i>3</i>명단 입력</h2>
-      <div class="paste-box" id="pasteBox" tabindex="0" role="button" aria-label="엑셀 내용 붙여넣기">
-        <b>📋 엑셀 내용 붙여넣기</b>
-        <span>엑셀에서 <b>점수 · 학교 · 이름</b> 칸을 드래그해 복사(⌘C / Ctrl+C)한 뒤,<br>여기를 한 번 누르고 <b>⌘V / Ctrl+V</b></span>
+      <h2><i>3</i>명단 입력 <span style="font-weight:500;color:var(--muted);font-size:13px">— 디자인마다 따로 저장돼요</span></h2>
+      <p class="sheet-tip">엑셀에서 <b>점수 · 학교 · 이름</b> 칸을 드래그해 복사(⌘C / Ctrl+C) → 아래 표 <b>1번 줄 「점수」 칸</b>을 누르고 <b>⌘V / Ctrl+V</b>.<br>
+        몇 줄이든 붙여넣은 만큼 줄이 자동으로 늘어나요. 직접 입력할 때는 <b>Enter</b> = 아래 칸, <b>Tab</b> = 옆 칸.</p>
+      <div class="sheet">
+        <table class="roster" id="roster">
+          <thead><tr><th class="n"></th><th class="c-score">점수</th><th>학교</th><th>이름</th><th class="note-col" title="상장에서 점수 바로 위에 크게 들어가요">점수 위 문구</th><th class="d"></th></tr></thead>
+          <tbody id="rosterBody"></tbody>
+        </table>
       </div>
-      <table class="roster" id="roster">
-        <thead><tr><th class="n">#</th><th class="c-score">점수</th><th>학교</th><th>이름</th><th class="note-col" title="상장에서 점수 바로 위에 크게 들어가요">점수 위 문구</th><th></th></tr></thead>
-        <tbody id="rosterBody"></tbody>
-      </table>
       <div class="roster-acts">
-        <button type="button" id="addRowBtn">+ 한 명 추가</button>
         <label class="file-btn">📄 엑셀 파일 불러오기<input type="file" id="fileInput" accept=".xlsx,.xls,.csv" /></label>
-        <button type="button" id="clearBtn" class="ghost">모두 지우기</button>
+        <button type="button" id="addRowBtn">+ 10줄 더</button>
+        <button type="button" id="clearBtn" class="ghost">이 디자인 명단 모두 지우기</button>
       </div>
-      <span class="hint">표에 <b>직접 입력</b>해도 돼요. <b>Enter</b>를 누르면 다음 줄로 넘어가요. 표의 아무 칸에 붙여넣어도 그 자리부터 채워져요.</span>
       <div class="note-help" id="noteHint">
         <b>「점수 위 문구」는 뭔가요?</b> (선택)<br>
         「전교 1등」처럼 적으면 상장에서 <b>점수 바로 위에 크게</b> 한 줄이 더 들어가요. 비워 두면 안 들어가요.
@@ -256,16 +258,32 @@
     });
     return {rows:out,errors:errors};
   }
-  // ----- 명단 입력 표 -----
-  var COLS=['score','school','name','note'];
+  // ----- 명단 입력 표 (엑셀처럼) · 디자인마다 따로 -----
+  var COLS=['score','school','name','note'],MIN_ROWS=20,SPARE=5,STORE='zest-cert-v1';
   function blankRow(){return {score:'',school:'',name:'',note:''};}
-  var entries=[blankRow(),blankRow(),blankRow()];
+  function filled(e){return COLS.some(function(k){return String(e[k]||'').trim();});}
+  function ensureRows(list){
+    var last=-1;list.forEach(function(e,i){if(filled(e))last=i;});
+    var want=Math.max(MIN_ROWS,last+1+SPARE);while(list.length<want)list.push(blankRow());
+    return list;
+  }
+  var STATE={};
+  ORDER.forEach(function(k){STATE[k]={exam:'2026년 1학기 기말고사',entries:ensureRows([])};});
+  try{var kept=JSON.parse(localStorage.getItem(STORE)||'null');if(kept)Object.keys(kept).forEach(function(k){if(STATE[k]){STATE[k].exam=kept[k].exam||STATE[k].exam;STATE[k].entries=ensureRows(kept[k].entries||[]);}});}catch(e){}
+  var entries=STATE[design].entries;
+  function persist(){
+    STATE[design].entries=entries;STATE[design].exam=$('examInput').value;
+    try{var o={};ORDER.forEach(function(k){o[k]={exam:STATE[k].exam,entries:STATE[k].entries.filter(filled)};});localStorage.setItem(STORE,JSON.stringify(o));}catch(e){}
+  }
   var typingTimer;
   function schedule(){clearTimeout(typingTimer);typingTimer=setTimeout(syncRows,250);}
-  function isBad(e){var any=COLS.some(function(k){return String(e[k]||'').trim();});return any&&(!String(e.score).trim()||!String(e.name).trim());}
-  function syncRows(){
-    rows=entries.filter(function(e){return String(e.score).trim()&&String(e.name).trim();})
+  function isBad(e){return filled(e)&&(!String(e.score).trim()||!String(e.name).trim());}
+  function validRows(list){
+    return list.filter(function(e){return String(e.score).trim()&&String(e.name).trim();})
       .map(function(e){return {score:String(e.score).trim(),school:String(e.school||'').trim(),name:String(e.name).trim(),note:String(e.note||'').trim()};});
+  }
+  function syncRows(){
+    rows=validRows(entries);
     var bad=entries.filter(isBad).length,m=$('parseMsg');
     if(!rows.length&&!bad){m.className='msg';m.textContent='';}
     else if(bad){m.className='msg err';m.textContent=rows.length+'명 준비됨 · 점수나 이름이 빈 줄 '+bad+'개는 빠져요 (빨간 칸).';}
@@ -274,9 +292,16 @@
       var e=entries[i];if(!e)return;tr.classList.toggle('bad',isBad(e));
       tr.querySelectorAll('input').forEach(function(inp){var k=inp.getAttribute('data-k');inp.classList.toggle('miss',(k==='score'||k==='name')&&!String(e[k]).trim());});
     });
-    render();
+    persist();updateCounts();render();
+  }
+  function updateCounts(){
+    [].forEach.call(document.querySelectorAll('#designs button'),function(b){
+      var k=b.getAttribute('data-k'),n=validRows(k===design?entries:STATE[k].entries).length;
+      b.querySelector('.cnt').textContent=n?n+(DESIGNS[k].perPage===1?'장':'명'):'';
+    });
   }
   function drawRoster(focusRow,focusCol){
+    ensureRows(entries);
     var tb=$('rosterBody');tb.innerHTML='';
     entries.forEach(function(e,i){
       var tr=document.createElement('tr');
@@ -284,15 +309,23 @@
       COLS.forEach(function(k,c){
         var td=document.createElement('td');if(k==='note')td.className='note-col';
         var inp=document.createElement('input');inp.type='text';inp.value=e[k]||'';inp.setAttribute('data-k',k);
-        inp.placeholder={score:'100',school:'중원고3',name:'노O희',note:'예) 전교 1등'}[k];
+        if(i===0)inp.placeholder={score:'100',school:'중원고3',name:'노O희',note:'예) 전교 1등'}[k];
         if(k==='score')inp.inputMode='decimal';
-        inp.addEventListener('input',function(){e[k]=inp.value;schedule();});
-        inp.addEventListener('keydown',function(ev){
-          if(ev.key==='Enter'&&!ev.isComposing){ev.preventDefault();if(i===entries.length-1)entries.push(blankRow());drawRoster(i+1,c);}
-          else if(ev.key==='ArrowDown'&&i<entries.length-1){ev.preventDefault();focusCell(i+1,c);}
-          else if(ev.key==='ArrowUp'&&i>0){ev.preventDefault();focusCell(i-1,c);}
+        inp.addEventListener('input',function(){
+          e[k]=inp.value;
+          if(i>=entries.length-2){var before=entries.length;ensureRows(entries);if(entries.length!==before){drawRoster(i,c);}}
+          schedule();
         });
-        // 엑셀에서 여러 줄·여러 칸을 복사해 붙여넣으면 이 칸부터 오른쪽·아래로 채운다
+        inp.addEventListener('keydown',function(ev){
+          if(ev.isComposing)return;
+          var atStart=inp.selectionStart===0&&inp.selectionEnd===0,atEnd=inp.selectionStart===inp.value.length;
+          if(ev.key==='Enter'){ev.preventDefault();focusCell(i+(ev.shiftKey?-1:1),c);}
+          else if(ev.key==='ArrowDown'){ev.preventDefault();focusCell(i+1,c);}
+          else if(ev.key==='ArrowUp'){ev.preventDefault();focusCell(i-1,c);}
+          else if(ev.key==='ArrowRight'&&atEnd){ev.preventDefault();focusCell(i,c+1);}
+          else if(ev.key==='ArrowLeft'&&atStart){ev.preventDefault();focusCell(i,c-1);}
+        });
+        // 엑셀에서 여러 줄·여러 칸을 복사해 붙여넣으면 이 칸부터 오른쪽·아래로 채우고, 모자라면 줄을 늘린다
         inp.addEventListener('paste',function(ev){
           var t=(ev.clipboardData||window.clipboardData).getData('text');
           if(!/[\t\n]/.test(t.replace(/\n$/,'')))return;
@@ -302,13 +335,18 @@
         td.appendChild(inp);tr.appendChild(td);
       });
       var dtd=document.createElement('td'),del=document.createElement('button');
-      del.type='button';del.className='del';del.title='이 줄 삭제';del.textContent='✕';
-      del.addEventListener('click',function(){entries.splice(i,1);if(!entries.length)entries.push(blankRow());drawRoster();syncRows();});
+      dtd.className='d';del.type='button';del.className='del';del.title='이 줄 삭제';del.textContent='✕';
+      del.addEventListener('click',function(){entries.splice(i,1);drawRoster();syncRows();});
       dtd.appendChild(del);tr.appendChild(dtd);tb.appendChild(tr);
     });
     if(focusRow!=null)focusCell(focusRow,focusCol||0);
   }
-  function focusCell(r,c){var tr=$('rosterBody').children[r];if(tr){var inp=tr.querySelectorAll('input')[c];if(inp){inp.focus();inp.select();}}}
+  function visibleCols(){return design==='certificate'?4:3;}
+  function focusCell(r,c){
+    if(r<0||c<0||c>=visibleCols())return;
+    if(r>=entries.length){entries.push(blankRow());ensureRows(entries);drawRoster();}
+    var tr=$('rosterBody').children[r];if(tr){var inp=tr.querySelectorAll('input')[c];if(inp){inp.focus();inp.select();}}
+  }
   function pasteLines(t,startRow,startCol){
     var lines=t.replace(/\r/g,'').split('\n').filter(function(l){return l.trim();}).map(function(l){return l.split('\t');});
     if(lines.length&&startCol===0&&!/\d/.test(lines[0][0]))lines.shift(); // 머리글 줄 건너뛰기
@@ -316,28 +354,15 @@
       var row=startRow+r;while(entries.length<=row)entries.push(blankRow());
       cells.forEach(function(v,j){var key=COLS[startCol+j];if(key)entries[row][key]=String(v).trim();});
     });
-    if(String(entries[entries.length-1].score).trim())entries.push(blankRow());
     drawRoster();syncRows();
     return lines.length;
   }
-  function firstEmptyRow(){
-    for(var i=0;i<entries.length;i++){if(!COLS.some(function(k){return String(entries[i][k]||'').trim();}))return i;}
-    return entries.length;
-  }
-  $('pasteBox').addEventListener('click',function(){this.focus();});
-  $('pasteBox').addEventListener('paste',function(ev){
-    ev.preventDefault();
-    var t=(ev.clipboardData||window.clipboardData).getData('text');
-    if(!t.trim()){toast('붙여넣을 내용이 없어요. 엑셀에서 먼저 복사해 주세요.');return;}
-    var n=pasteLines(t,firstEmptyRow(),0);
-    toast(n+'명을 붙여넣었어요.');this.blur();
-  });
-  $('addRowBtn').addEventListener('click',function(){entries.push(blankRow());drawRoster(entries.length-1,0);});
+  $('addRowBtn').addEventListener('click',function(){for(var i=0;i<10;i++)entries.push(blankRow());drawRoster();});
   $('clearBtn').addEventListener('click',function(){
-    if(entries.some(function(e){return COLS.some(function(k){return String(e[k]||'').trim();});})&&!confirm('입력한 명단을 모두 지울까요?'))return;
-    entries=[blankRow(),blankRow(),blankRow()];drawRoster(0,0);syncRows();
+    if(entries.some(filled)&&!confirm('「'+DESIGNS[design].label+'」 명단을 모두 지울까요?'))return;
+    entries.length=0;ensureRows(entries);drawRoster(0,0);syncRows();
   });
-  $('examInput').addEventListener('input',function(){clearTimeout(typingTimer);typingTimer=setTimeout(render,250);});
+  $('examInput').addEventListener('input',function(){clearTimeout(typingTimer);typingTimer=setTimeout(function(){persist();render();},250);});
   $('sortInput').addEventListener('change',render);
   $('fileInput').addEventListener('change',function(){
     var f=this.files&&this.files[0];if(!f)return;
@@ -347,8 +372,8 @@
         var wb=XLSX.read(new Uint8Array(fr.result),{type:'array'});
         var aoa=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:false,defval:''});
         var r=parseRows(aoa);
-        entries=r.rows.map(function(x){return {score:x.score,school:x.school,name:x.name,note:x.note};});
-        entries.push(blankRow());drawRoster();syncRows();
+        entries.length=0;r.rows.forEach(function(x){entries.push({score:x.score,school:x.school,name:x.name,note:x.note});});
+        drawRoster();syncRows();
         toast(r.rows.length+'명을 불러왔어요.'+(r.errors.length?' (칸이 모자란 줄 '+r.errors.length+'개는 빠졌어요)':''));
       }catch(e){$('parseMsg').className='msg err';$('parseMsg').textContent='파일을 읽지 못했어요: '+e.message;}
     };
@@ -361,8 +386,12 @@
     var d=DESIGNS[k];
     var b=document.createElement('button');
     b.type='button';b.setAttribute('data-k',k);
-    b.innerHTML='<img alt="" src="'+d.bg+'"><div>'+d.label+'</div><div style="font-weight:500;font-size:11.5px">'+d.sub+'</div>';
-    b.addEventListener('click',function(){design=k;syncDesign();render();});
+    b.innerHTML='<img alt="" src="'+d.bg+'"><div>'+d.label+'</div><div style="font-weight:500;font-size:11.5px">'+d.sub+'</div><span class="cnt"></span>';
+    b.addEventListener('click',function(){
+      if(k===design)return;
+      persist();design=k;entries=STATE[k].entries;$('examInput').value=STATE[k].exam;
+      syncDesign();drawRoster();syncRows();
+    });
     $('designs').appendChild(b);
   });
   function syncDesign(){
@@ -467,7 +496,7 @@
   var toastTimer;
   function toast(t){var el=$('toast');el.textContent=t;el.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.add('hidden');},3500);}
 
-  drawRoster();syncDesign();render();
+  $('examInput').value=STATE[design].exam;syncDesign();drawRoster();syncRows();
 })();
 </script>
 </body>
