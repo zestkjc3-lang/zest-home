@@ -42,6 +42,23 @@
   .hint b{color:var(--ink)}
   .file{display:inline-block;margin-top:8px;font-size:13.5px;font-weight:700;color:var(--blue);cursor:pointer}
   .file input{display:none}
+  .roster{width:100%;border-collapse:separate;border-spacing:0 6px;table-layout:fixed}
+  .roster th{font-size:12px;color:var(--muted);text-align:left;font-weight:700;padding:0 4px}
+  .roster td{padding:0 2px}
+  .roster input{width:100%;padding:8px 7px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:14px}
+  .roster input:focus{outline:2px solid rgba(47,111,237,.35);border-color:var(--blue)}
+  .roster .n{width:22px;color:var(--muted);font-size:12px;text-align:center;padding:0}
+  .roster .c-score{width:62px}
+  .roster th:last-child{width:26px}
+  .roster .note-col{width:76px}
+  .roster:not(.show-note) .note-col{display:none}
+  .roster tr.bad input.miss{border-color:#f0a5a5;background:#fff6f6}
+  .roster .del{border:0;background:none;color:#b3a99a;font-size:15px;padding:4px;width:100%}
+  .roster .del:hover{color:var(--red)}
+  .roster-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 8px}
+  .roster-acts button,.file-btn{border:1.5px dashed #cbbf9f;background:#fff;border-radius:10px;padding:8px 12px;font-weight:700;font-size:14px;color:var(--ink);cursor:pointer}
+  .roster-acts .ghost{border-style:solid;border-color:var(--line);color:var(--muted)}
+  .file-btn input{display:none}
   .check{display:flex;align-items:center;gap:8px;font-size:14px;margin-top:8px}
   .msg{font-size:13.5px;margin-top:8px;line-height:1.5}
   .msg.err{color:var(--red)}
@@ -85,11 +102,19 @@
     </section>
 
     <section class="step field">
-      <h2><i>3</i>명단 붙여넣기</h2>
-      <textarea id="listInput" spellcheck="false" placeholder="100&#9;중원고3&#9;노O희&#10;99&#9;중원고1&#9;양O민"></textarea>
-      <span class="hint">엑셀에서 <b>점수 · 학교 · 이름</b> 세 칸을 드래그해 복사한 뒤 여기에 붙여넣으세요. 한 줄에 한 명이에요.<br>
-        <span id="noteHint">세로 상장은 네 번째 칸(<b>비고</b>)에 「전교 1등」처럼 적으면 점수 위에 한 줄이 더 들어가요.</span></span>
-      <label class="file">📄 엑셀·CSV 파일로 불러오기<input type="file" id="fileInput" accept=".xlsx,.xls,.csv" /></label>
+      <h2><i>3</i>명단 입력</h2>
+      <table class="roster" id="roster">
+        <thead><tr><th class="n">#</th><th class="c-score">점수</th><th>학교</th><th>이름</th><th class="note-col">비고</th><th></th></tr></thead>
+        <tbody id="rosterBody"></tbody>
+      </table>
+      <div class="roster-acts">
+        <button type="button" id="addRowBtn">+ 한 명 추가</button>
+        <label class="file-btn">📄 엑셀 파일 불러오기<input type="file" id="fileInput" accept=".xlsx,.xls,.csv" /></label>
+        <button type="button" id="clearBtn" class="ghost">모두 지우기</button>
+      </div>
+      <span class="hint">칸을 눌러 <b>직접 입력</b>하세요. <b>Enter</b>를 누르면 다음 줄로 넘어가요.<br>
+        엑셀에서 여러 줄을 복사해 <b>아무 칸에나 붙여넣으면</b> 그 자리부터 한꺼번에 채워져요.<br>
+        <span id="noteHint">세로 상장은 <b>비고</b> 칸에 「전교 1등」처럼 적으면 점수 위에 한 줄이 더 들어가요.</span></span>
       <label class="check hidden" id="sortRow"><input type="checkbox" id="sortInput" checked /> 점수 높은 순으로 정렬</label>
       <div class="msg" id="parseMsg"></div>
     </section>
@@ -209,20 +234,71 @@
     });
     return {rows:out,errors:errors};
   }
-  function fromText(t){
-    var lines=t.replace(/\r/g,'').split('\n').map(function(l){return l.split(/\t|,(?=(?:[^"]*"[^"]*")*[^"]*$)|\s{2,}/);});
-    return parseRows(lines);
-  }
-  function setRows(r){
-    rows=r.rows;
-    var m=$('parseMsg');
-    if(!rows.length){m.className='msg';m.textContent='';}
-    else if(r.errors.length){m.className='msg err';m.textContent=rows.length+'명 읽음 · 칸이 모자란 줄은 빠졌어요: '+r.errors.slice(0,5).join(', ');}
-    else{m.className='msg ok';m.textContent='✓ '+rows.length+'명을 읽었어요.';}
+  // ----- 명단 입력 표 -----
+  var COLS=['score','school','name','note'];
+  function blankRow(){return {score:'',school:'',name:'',note:''};}
+  var entries=[blankRow(),blankRow(),blankRow()];
+  var typingTimer;
+  function schedule(){clearTimeout(typingTimer);typingTimer=setTimeout(syncRows,250);}
+  function isBad(e){var any=COLS.some(function(k){return String(e[k]||'').trim();});return any&&(!String(e.score).trim()||!String(e.name).trim());}
+  function syncRows(){
+    rows=entries.filter(function(e){return String(e.score).trim()&&String(e.name).trim();})
+      .map(function(e){return {score:String(e.score).trim(),school:String(e.school||'').trim(),name:String(e.name).trim(),note:String(e.note||'').trim()};});
+    var bad=entries.filter(isBad).length,m=$('parseMsg');
+    if(!rows.length&&!bad){m.className='msg';m.textContent='';}
+    else if(bad){m.className='msg err';m.textContent=rows.length+'명 준비됨 · 점수나 이름이 빈 줄 '+bad+'개는 빠져요 (빨간 칸).';}
+    else{m.className='msg ok';m.textContent='✓ '+rows.length+'명 준비됐어요.';}
+    [].forEach.call($('rosterBody').children,function(tr,i){
+      var e=entries[i];if(!e)return;tr.classList.toggle('bad',isBad(e));
+      tr.querySelectorAll('input').forEach(function(inp){var k=inp.getAttribute('data-k');inp.classList.toggle('miss',(k==='score'||k==='name')&&!String(e[k]).trim());});
+    });
     render();
   }
-  var typingTimer;
-  $('listInput').addEventListener('input',function(){clearTimeout(typingTimer);typingTimer=setTimeout(function(){setRows(fromText($('listInput').value));},250);});
+  function drawRoster(focusRow,focusCol){
+    var tb=$('rosterBody');tb.innerHTML='';
+    entries.forEach(function(e,i){
+      var tr=document.createElement('tr');
+      var n=document.createElement('td');n.className='n';n.textContent=i+1;tr.appendChild(n);
+      COLS.forEach(function(k,c){
+        var td=document.createElement('td');if(k==='note')td.className='note-col';
+        var inp=document.createElement('input');inp.type='text';inp.value=e[k]||'';inp.setAttribute('data-k',k);
+        inp.placeholder={score:'100',school:'중원고3',name:'노O희',note:'전교 1등'}[k];
+        if(k==='score')inp.inputMode='decimal';
+        inp.addEventListener('input',function(){e[k]=inp.value;schedule();});
+        inp.addEventListener('keydown',function(ev){
+          if(ev.key==='Enter'&&!ev.isComposing){ev.preventDefault();if(i===entries.length-1)entries.push(blankRow());drawRoster(i+1,c);}
+          else if(ev.key==='ArrowDown'&&i<entries.length-1){ev.preventDefault();focusCell(i+1,c);}
+          else if(ev.key==='ArrowUp'&&i>0){ev.preventDefault();focusCell(i-1,c);}
+        });
+        // 엑셀에서 여러 줄·여러 칸을 복사해 붙여넣으면 이 칸부터 오른쪽·아래로 채운다
+        inp.addEventListener('paste',function(ev){
+          var t=(ev.clipboardData||window.clipboardData).getData('text');
+          if(!/[\t\n]/.test(t.replace(/\n$/,'')))return;
+          ev.preventDefault();
+          var lines=t.replace(/\r/g,'').split('\n').filter(function(l){return l.trim();}).map(function(l){return l.split('\t');});
+          if(lines.length&&c===0&&!/\d/.test(lines[0][0]))lines.shift(); // 머리글 줄 건너뛰기
+          lines.forEach(function(cells,r){
+            var row=i+r;while(entries.length<=row)entries.push(blankRow());
+            cells.forEach(function(v,j){var key=COLS[c+j];if(key)entries[row][key]=String(v).trim();});
+          });
+          if(String(entries[entries.length-1].score).trim())entries.push(blankRow());
+          drawRoster();syncRows();toast(lines.length+'줄을 붙여넣었어요.');
+        });
+        td.appendChild(inp);tr.appendChild(td);
+      });
+      var dtd=document.createElement('td'),del=document.createElement('button');
+      del.type='button';del.className='del';del.title='이 줄 삭제';del.textContent='✕';
+      del.addEventListener('click',function(){entries.splice(i,1);if(!entries.length)entries.push(blankRow());drawRoster();syncRows();});
+      dtd.appendChild(del);tr.appendChild(dtd);tb.appendChild(tr);
+    });
+    if(focusRow!=null)focusCell(focusRow,focusCol||0);
+  }
+  function focusCell(r,c){var tr=$('rosterBody').children[r];if(tr){var inp=tr.querySelectorAll('input')[c];if(inp){inp.focus();inp.select();}}}
+  $('addRowBtn').addEventListener('click',function(){entries.push(blankRow());drawRoster(entries.length-1,0);});
+  $('clearBtn').addEventListener('click',function(){
+    if(entries.some(function(e){return COLS.some(function(k){return String(e[k]||'').trim();});})&&!confirm('입력한 명단을 모두 지울까요?'))return;
+    entries=[blankRow(),blankRow(),blankRow()];drawRoster(0,0);syncRows();
+  });
   $('examInput').addEventListener('input',function(){clearTimeout(typingTimer);typingTimer=setTimeout(render,250);});
   $('sortInput').addEventListener('change',render);
   $('fileInput').addEventListener('change',function(){
@@ -232,8 +308,10 @@
       try{
         var wb=XLSX.read(new Uint8Array(fr.result),{type:'array'});
         var aoa=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:false,defval:''});
-        $('listInput').value=aoa.filter(function(r){return r.some(function(c){return String(c).trim();});}).map(function(r){return r.slice(0,4).join('\t');}).join('\n');
-        setRows(parseRows(aoa));
+        var r=parseRows(aoa);
+        entries=r.rows.map(function(x){return {score:x.score,school:x.school,name:x.name,note:x.note};});
+        entries.push(blankRow());drawRoster();syncRows();
+        toast(r.rows.length+'명을 불러왔어요.'+(r.errors.length?' (칸이 모자란 줄 '+r.errors.length+'개는 빠졌어요)':''));
       }catch(e){$('parseMsg').className='msg err';$('parseMsg').textContent='파일을 읽지 못했어요: '+e.message;}
     };
     fr.readAsArrayBuffer(f);
@@ -255,6 +333,7 @@
     $('grid').style.setProperty('--card',d.card);
     $('sortRow').classList.toggle('hidden',!d.sortable);
     $('noteHint').classList.toggle('hidden',design!=='certificate');
+    $('roster').classList.toggle('show-note',design==='certificate');
     $('pdfBtn').classList.toggle('hidden',!d.pdf);
   }
 
@@ -285,7 +364,7 @@
     $('zipBtn').disabled=!pages.length;$('pdfBtn').disabled=!pages.length;
     $('countText').textContent=pages.length?(d.label+' '+pages.length+'장'):'미리보기';
     if(!pages.length){
-      grid.innerHTML='<div class="empty">왼쪽에 명단을 붙여넣으면<br>여기에 '+d.label+'이(가) 한 장씩 만들어져요.</div>';
+      grid.innerHTML='<div class="empty">명단을 입력하면<br>여기에 '+d.label+'이(가) 한 장씩 만들어져요.</div>';
       return;
     }
     pages.forEach(function(p,i){
@@ -350,7 +429,7 @@
   var toastTimer;
   function toast(t){var el=$('toast');el.textContent=t;el.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.add('hidden');},3500);}
 
-  syncDesign();render();
+  drawRoster();syncDesign();render();
 })();
 </script>
 </body>
