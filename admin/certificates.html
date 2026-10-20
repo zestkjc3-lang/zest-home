@@ -12,6 +12,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
+  /* 명예의 전당 원본 글꼴 「공체」 = G마켓 산스 (무료 상업용) */
+  @font-face{font-family:'GmarketSansLight';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansLight.woff') format('woff');}
+  @font-face{font-family:'GmarketSansMedium';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');}
+  @font-face{font-family:'GmarketSansBold';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff') format('woff');}
   :root{--ink:#1c1a15;--muted:#6b6558;--line:#e3ddcf;--bg:#f6f3ec;--paper:#fff;--gold:#b99a57;--blue:#2f6fed;--red:#d9480f;--green:#2b8a3e}
   *{box-sizing:border-box}
   html,body{margin:0}
@@ -50,7 +54,8 @@
   .roster .n{width:22px;color:var(--muted);font-size:12px;text-align:center;padding:0}
   .roster .c-score{width:62px}
   .roster th:last-child{width:26px}
-  .roster .note-col{width:76px}
+  .roster .note-col{width:86px}
+  .roster th.note-col{font-size:11px;line-height:1.2}
   .roster:not(.show-note) .note-col{display:none}
   .roster tr.bad input.miss{border-color:#f0a5a5;background:#fff6f6}
   .roster .del{border:0;background:none;color:#b3a99a;font-size:15px;padding:4px;width:100%}
@@ -59,6 +64,17 @@
   .roster-acts button,.file-btn{border:1.5px dashed #cbbf9f;background:#fff;border-radius:10px;padding:8px 12px;font-weight:700;font-size:14px;color:var(--ink);cursor:pointer}
   .roster-acts .ghost{border-style:solid;border-color:var(--line);color:var(--muted)}
   .file-btn input{display:none}
+  .paste-box{display:flex;flex-direction:column;gap:4px;border:2px dashed #cbbf9f;background:#fffdf7;border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer;font-size:13.5px;color:var(--muted);line-height:1.55}
+  .paste-box>b{font-size:15px;color:var(--ink)}
+  .paste-box:hover{border-color:var(--gold)}
+  .paste-box:focus{outline:none;border-color:var(--blue);background:#f2f6ff;box-shadow:0 0 0 3px rgba(47,111,237,.15)}
+  .paste-box:focus>b::after{content:"  ← 이제 ⌘V / Ctrl+V 를 누르세요";color:var(--blue);font-weight:700;font-size:13px}
+  .note-help{margin-top:10px;background:#f7f3ea;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.6;color:var(--muted)}
+  .note-help b{color:var(--ink)}
+  .note-demo{margin-top:8px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;font-family:"Nanum Myeongjo",serif;font-weight:800;color:#5a5038;display:flex;flex-direction:column;gap:1px}
+  .note-demo .nd-1{font-size:16px;color:#2f6fed;outline:2px dashed rgba(47,111,237,.5);outline-offset:2px;border-radius:4px;align-self:center;padding:0 6px}
+  .note-demo .nd-2{font-size:15px}
+  .note-demo .nd-3{font-size:11px}
   .check{display:flex;align-items:center;gap:8px;font-size:14px;margin-top:8px}
   .msg{font-size:13.5px;margin-top:8px;line-height:1.5}
   .msg.err{color:var(--red)}
@@ -103,8 +119,12 @@
 
     <section class="step field">
       <h2><i>3</i>명단 입력</h2>
+      <div class="paste-box" id="pasteBox" tabindex="0" role="button" aria-label="엑셀 내용 붙여넣기">
+        <b>📋 엑셀 내용 붙여넣기</b>
+        <span>엑셀에서 <b>점수 · 학교 · 이름</b> 칸을 드래그해 복사(⌘C / Ctrl+C)한 뒤,<br>여기를 한 번 누르고 <b>⌘V / Ctrl+V</b></span>
+      </div>
       <table class="roster" id="roster">
-        <thead><tr><th class="n">#</th><th class="c-score">점수</th><th>학교</th><th>이름</th><th class="note-col">비고</th><th></th></tr></thead>
+        <thead><tr><th class="n">#</th><th class="c-score">점수</th><th>학교</th><th>이름</th><th class="note-col" title="상장에서 점수 바로 위에 크게 들어가요">점수 위 문구</th><th></th></tr></thead>
         <tbody id="rosterBody"></tbody>
       </table>
       <div class="roster-acts">
@@ -112,9 +132,12 @@
         <label class="file-btn">📄 엑셀 파일 불러오기<input type="file" id="fileInput" accept=".xlsx,.xls,.csv" /></label>
         <button type="button" id="clearBtn" class="ghost">모두 지우기</button>
       </div>
-      <span class="hint">칸을 눌러 <b>직접 입력</b>하세요. <b>Enter</b>를 누르면 다음 줄로 넘어가요.<br>
-        엑셀에서 여러 줄을 복사해 <b>아무 칸에나 붙여넣으면</b> 그 자리부터 한꺼번에 채워져요.<br>
-        <span id="noteHint">세로 상장은 <b>비고</b> 칸에 「전교 1등」처럼 적으면 점수 위에 한 줄이 더 들어가요.</span></span>
+      <span class="hint">표에 <b>직접 입력</b>해도 돼요. <b>Enter</b>를 누르면 다음 줄로 넘어가요. 표의 아무 칸에 붙여넣어도 그 자리부터 채워져요.</span>
+      <div class="note-help" id="noteHint">
+        <b>「점수 위 문구」는 뭔가요?</b> (선택)<br>
+        「전교 1등」처럼 적으면 상장에서 <b>점수 바로 위에 크게</b> 한 줄이 더 들어가요. 비워 두면 안 들어가요.
+        <div class="note-demo"><span class="nd-1">전교 1등</span><span class="nd-2">100점</span><span class="nd-3">중원고1 · 노O희</span></div>
+      </div>
       <label class="check hidden" id="sortRow"><input type="checkbox" id="sortInput" checked /> 점수 높은 순으로 정렬</label>
       <div class="msg" id="parseMsg"></div>
     </section>
@@ -163,13 +186,12 @@
       label:'성적 발표',sub:'명예의 전당 (최대 24명)',bg:BG+'honor-bg.jpg',w:1365,h:1365,card:'340px',
       file:'성적발표',perPage:24,sortable:true,
       draw:function(ctx,rows,exam){
-        var sans='Pretendard, sans-serif';
-        text(ctx,exam,686,134,{family:sans,weight:700,size:78,spacing:-.01,fill:GOLD_LIGHT,shadow:'rgba(0,0,0,.55)'});
+        text(ctx,exam,686,134,{family:'GmarketSansBold, sans-serif',weight:400,size:73,spacing:0,fill:GOLD_LIGHT,shadow:'rgba(0,0,0,.55)'});
         rows.forEach(function(r,i){
           var col=i<12?0:1,row=i%12,y=450+row*62.8;
           var sx=col?702:190,nx=col?1015:471;
-          text(ctx,score(r.score),sx,y,{family:sans,weight:800,size:40,spacing:.065,fill:'#3a2a0c',align:'left'});
-          text(ctx,r.school+' '+r.name,nx,y,{family:sans,weight:400,size:40,spacing:.065,fill:'#3a2a0c'});
+          text(ctx,score(r.score),sx,y,{family:'GmarketSansBold, sans-serif',weight:400,size:41,spacing:0,fill:'#3a2a0c',align:'left'});
+          text(ctx,r.school+' '+r.name,nx,y,{family:'GmarketSansLight, sans-serif',weight:400,size:38.5,spacing:0,fill:'#3a2a0c'});
         });
       }
     },
@@ -219,7 +241,7 @@
     return bgCache[src];
   }
   var fontsReady=Promise.all([
-    '800 100px "Nanum Myeongjo"','400 100px Pretendard','500 100px Pretendard','700 100px Pretendard','800 100px Pretendard'
+    '800 100px "Nanum Myeongjo"','400 100px Pretendard','500 100px Pretendard','100px GmarketSansLight','100px GmarketSansMedium','100px GmarketSansBold','700 100px Pretendard','800 100px Pretendard'
   ].map(function(f){return document.fonts.load(f,'가나다0123점');})).catch(function(){});
 
   // ----- 명단 읽기 -----
@@ -262,7 +284,7 @@
       COLS.forEach(function(k,c){
         var td=document.createElement('td');if(k==='note')td.className='note-col';
         var inp=document.createElement('input');inp.type='text';inp.value=e[k]||'';inp.setAttribute('data-k',k);
-        inp.placeholder={score:'100',school:'중원고3',name:'노O희',note:'전교 1등'}[k];
+        inp.placeholder={score:'100',school:'중원고3',name:'노O희',note:'예) 전교 1등'}[k];
         if(k==='score')inp.inputMode='decimal';
         inp.addEventListener('input',function(){e[k]=inp.value;schedule();});
         inp.addEventListener('keydown',function(ev){
@@ -275,14 +297,7 @@
           var t=(ev.clipboardData||window.clipboardData).getData('text');
           if(!/[\t\n]/.test(t.replace(/\n$/,'')))return;
           ev.preventDefault();
-          var lines=t.replace(/\r/g,'').split('\n').filter(function(l){return l.trim();}).map(function(l){return l.split('\t');});
-          if(lines.length&&c===0&&!/\d/.test(lines[0][0]))lines.shift(); // 머리글 줄 건너뛰기
-          lines.forEach(function(cells,r){
-            var row=i+r;while(entries.length<=row)entries.push(blankRow());
-            cells.forEach(function(v,j){var key=COLS[c+j];if(key)entries[row][key]=String(v).trim();});
-          });
-          if(String(entries[entries.length-1].score).trim())entries.push(blankRow());
-          drawRoster();syncRows();toast(lines.length+'줄을 붙여넣었어요.');
+          toast(pasteLines(t,i,c)+'줄을 붙여넣었어요.');
         });
         td.appendChild(inp);tr.appendChild(td);
       });
@@ -294,6 +309,29 @@
     if(focusRow!=null)focusCell(focusRow,focusCol||0);
   }
   function focusCell(r,c){var tr=$('rosterBody').children[r];if(tr){var inp=tr.querySelectorAll('input')[c];if(inp){inp.focus();inp.select();}}}
+  function pasteLines(t,startRow,startCol){
+    var lines=t.replace(/\r/g,'').split('\n').filter(function(l){return l.trim();}).map(function(l){return l.split('\t');});
+    if(lines.length&&startCol===0&&!/\d/.test(lines[0][0]))lines.shift(); // 머리글 줄 건너뛰기
+    lines.forEach(function(cells,r){
+      var row=startRow+r;while(entries.length<=row)entries.push(blankRow());
+      cells.forEach(function(v,j){var key=COLS[startCol+j];if(key)entries[row][key]=String(v).trim();});
+    });
+    if(String(entries[entries.length-1].score).trim())entries.push(blankRow());
+    drawRoster();syncRows();
+    return lines.length;
+  }
+  function firstEmptyRow(){
+    for(var i=0;i<entries.length;i++){if(!COLS.some(function(k){return String(entries[i][k]||'').trim();}))return i;}
+    return entries.length;
+  }
+  $('pasteBox').addEventListener('click',function(){this.focus();});
+  $('pasteBox').addEventListener('paste',function(ev){
+    ev.preventDefault();
+    var t=(ev.clipboardData||window.clipboardData).getData('text');
+    if(!t.trim()){toast('붙여넣을 내용이 없어요. 엑셀에서 먼저 복사해 주세요.');return;}
+    var n=pasteLines(t,firstEmptyRow(),0);
+    toast(n+'명을 붙여넣었어요.');this.blur();
+  });
   $('addRowBtn').addEventListener('click',function(){entries.push(blankRow());drawRoster(entries.length-1,0);});
   $('clearBtn').addEventListener('click',function(){
     if(entries.some(function(e){return COLS.some(function(k){return String(e[k]||'').trim();});})&&!confirm('입력한 명단을 모두 지울까요?'))return;
