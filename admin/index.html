@@ -82,6 +82,9 @@
   .item.dragging{opacity:.9;box-shadow:0 14px 30px -12px rgba(0,0,0,.35);border-color:var(--blue);position:relative;z-index:3;background:#f5f8ff}
   body.is-dragging{cursor:grabbing;user-select:none}
   .item .ctl .del{color:var(--red)}
+  details.loose{margin-top:18px;border-top:1px dashed var(--line);padding-top:12px}
+  details.loose summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--muted);padding:6px 2px}
+  details.loose .item{margin-top:8px}
   .photo .acts{display:flex;border-top:1px solid var(--line)}
   .photo .acts > *{flex:1;display:block;text-align:center;padding:10px;background:var(--paper);font-weight:700;color:var(--blue);cursor:pointer;text-decoration:none;border:0;font-size:14px}
   .photo .acts > * + *{border-left:1px solid var(--line)}
@@ -207,7 +210,6 @@
         <button type="button" role="tab" data-tab="banners" aria-selected="true">메인 배너</button>
         <button type="button" role="tab" data-tab="posts" aria-selected="false">공지 카드</button>
         <button type="button" role="tab" data-tab="teachers" aria-selected="false">강사진</button>
-        <button type="button" role="tab" data-tab="articles" aria-selected="false">✍️ 글 쓰기</button>
       </nav>
       <div class="panel-body" id="panelBody"></div>
     </aside>
@@ -242,7 +244,7 @@
 
     <h3>✍️ 글 쓰기 · 글 고치기 (카드·배너를 누르면 열리는 글)</h3>
     <ol>
-      <li>위의 <b>「✍️ 글 쓰기」</b> 탭에서 고칠 글의 「✏️ 수정」을 누르세요. 새 글은 카드·배너 수정 칸의 <b>「✏️ 새 글 쓰고 여기에 연결하기」</b>로 만들어요.</li>
+      <li>미리보기에서 카드·배너를 눌러 글로 들어간 뒤 글 왼쪽 위 <b>「✏️ 이 글 수정」</b>을 누르세요. 또는 배너·공지 카드 목록에서 <b>「📝 글」</b> 버튼. 새 글은 카드·배너 수정 칸의 <b>「✏️ 새 글 쓰고 여기에 연결하기」</b>로 만들어요.</li>
       <li>왼쪽 미리보기가 <b>글 화면</b>으로 바뀌어요. 글자를 바로 눌러서 고치면 돼요.</li>
       <li>위쪽 도구 막대: <b>글씨체 · 크기 · 굵게 · 색 · 형광펜 · 정렬 · 목록 · 소제목 · 링크 · 구분선 · 📷 사진 · 🧩 디자인 상자</b>(번호 카드, 단계 상자, 강조 상자, 사진 2칸 등).</li>
       <li>사진을 누르면 <b>작게 · 중간 · 원래 크기 · 사진 바꾸기 · 지우기</b>가 나와요. 사진 파일을 복사해서 붙여넣어도 돼요.</li>
@@ -322,7 +324,7 @@
       blank:function(){return {id:'t'+Date.now().toString(36),name:'',role:'',subject:'',photo:'',badge:'',card:'',tag:'',points:[],edu:[],career:[],books:[]};}
     },
     articles:{label:'글',file:'data/articles.json',optional:true,
-      tip:'카드나 배너를 눌렀을 때 열리는 글이에요. 고칠 글의 「✏️ 수정」을 누르면 왼쪽 미리보기가 글 화면으로 바뀌고, 거기서 바로 고쳐요.',
+      tip:'카드나 배너를 눌렀을 때 열리는 글이에요.',
       title:function(it){return articleTitle(it);},
       sub:function(it){var n=linkers(it.id).length;return n?'카드·배너 '+n+'곳에 연결됨':'아직 연결 안 됨';},
       thumb:function(it){var m=/<img[^>]+src="([^"]+)"/.exec(it.html||'');return m?m[1].replace(/&amp;/g,'&'):'';},
@@ -358,6 +360,7 @@
   }
 
   var token='', data={}, saved={}, fileSha={}, uploads={}, tab='banners', editing=-1, frameReady=false;
+  var articleBack={tab:'banners',editing:-1};  // 글 편집을 마치면 돌아갈 곳 (글은 따로 탭 없이 연결된 배너·카드에서 연다)
   var $=function(id){return document.getElementById(id);};
 
   // ---------- GitHub API ----------
@@ -462,6 +465,7 @@
         var tt=document.querySelector('#panelBody [data-article-title]');if(tt)tt.textContent=ea.title;
       }
     }
+    if(e.data.type==='zest-article-open'&&articleById(e.data.id)){goArticle(e.data.id);}
     if(e.data.type==='zest-need-article'){var a=articleById(e.data.id);if(a)$('frame').contentWindow.postMessage({type:'zest-article',article:a},location.origin);}
   });
   [].forEach.call(document.querySelectorAll('[data-device]'),function(b){
@@ -493,8 +497,9 @@
   }
 
   function renderPanel(){
-    [].forEach.call(document.querySelectorAll('[data-tab]'),function(b){b.setAttribute('aria-selected',b.getAttribute('data-tab')===tab?'true':'false');});
+    [].forEach.call(document.querySelectorAll('[data-tab]'),function(b){b.setAttribute('aria-selected',b.getAttribute('data-tab')===(tab==='articles'?articleBack.tab:tab)?'true':'false');});
     var body=$('panelBody');body.innerHTML='';
+    if(tab==='articles'&&!(editing>=0&&data.articles[editing])){tab=articleBack.tab;editing=articleBack.editing;if(!(editing>=0&&(data[tab]||[])[editing]))editing=-1;}
     var sec=SECTIONS[tab],items=data[tab]||[];
     syncPreview();
     if(editing>=0&&items[editing]){renderForm(body,sec,items[editing]);return;}
@@ -509,6 +514,7 @@
         el('div',{'class':'t',on:{click:function(){openItem(tab,k);}}},[el('b',{text:sec.title(it)}),el('small',{text:sec.sub(it)})]),
         el('div',{'class':'ctl'},[
           el('button',{type:'button','class':'edit-btn',text:'✏️ 수정',on:{click:function(){openItem(tab,k);}}}),
+          linkedArticle(it)?el('button',{type:'button','class':'edit-btn',text:'📝 글',title:'눌렀을 때 열리는 글 고치기',on:{click:function(){goArticle(linkedArticle(it));}}}):null,
           el('button',{type:'button','class':'del',text:'🗑 삭제',on:{click:function(){removeItem(tab,k);}}})
         ])
       ]));
@@ -518,6 +524,31 @@
     }else{
       body.appendChild(el('button',{type:'button','class':'add',text:'+ 새 '+sec.label+' 추가',on:{click:function(){addItem(tab);}}}));
     }
+    if(tab==='posts')body.appendChild(looseArticles());
+  }
+  function linkedArticle(it){
+    var l=it&&it.link||'';
+    var id=l.indexOf(ARTICLE_LINK)===0?l.slice(ARTICLE_LINK.length):'';
+    return id&&articleById(id)?id:'';
+  }
+  // 카드·배너에 연결되지 않은 글 (프로그램 소개처럼 홈페이지 고정 칸에서 열리는 글 등)
+  function looseArticles(){
+    var list=(data.articles||[]).map(function(a,k){return [a,k];}).filter(function(x){return !linkers(x[0].id).length;});
+    var box=el('details',{'class':'loose'});
+    box.appendChild(el('summary',{text:'📄 카드·배너에 연결 안 된 글 ('+list.length+') — 프로그램 소개 등'}));
+    if(!list.length)box.appendChild(el('div',{'class':'hint',style:'color:var(--muted);padding:8px 2px',text:'없어요.'}));
+    list.forEach(function(x){
+      var a=x[0],k=x[1];
+      box.appendChild(el('div',{'class':'item'},[
+        el('img',{src:imgSrc(SECTIONS.articles.thumb(a)),alt:''}),
+        el('div',{'class':'t',on:{click:function(){goArticle(a.id);}}},[el('b',{text:articleTitle(a)}),el('small',{text:'post.html?id='+a.id})]),
+        el('div',{'class':'ctl'},[
+          el('button',{type:'button','class':'edit-btn',text:'✏️ 수정',on:{click:function(){goArticle(a.id);}}}),
+          el('button',{type:'button','class':'del',text:'🗑 삭제',on:{click:function(){removeItem('articles',k);}}})
+        ])
+      ]));
+    });
+    return box;
   }
   function addItem(name){
     var sec=SECTIONS[name];
@@ -573,7 +604,9 @@
 
   function renderForm(body,sec,it){
     var name=tab,items=data[name],idx=editing;
-    body.appendChild(el('button',{type:'button','class':'back',text:'← 목록으로',on:{click:function(){editing=-1;renderPanel();}}}));
+    var back=function(){if(name==='articles'){tab=articleBack.tab;editing=articleBack.editing;if(!(editing>=0&&(data[tab]||[])[editing]))editing=-1;}else editing=-1;renderPanel();};
+    var backLabel=name==='articles'&&articleBack.editing>=0&&(data[articleBack.tab]||[])[articleBack.editing]?'← '+SECTIONS[articleBack.tab].label+' 수정으로 돌아가기':'← 목록으로';
+    body.appendChild(el('button',{type:'button','class':'back',text:backLabel,on:{click:back}}));
     sec.fields.forEach(function(f){
       var box=el('div',{'class':'field'});
       box.appendChild(el('label',{text:f.label}));
@@ -656,7 +689,7 @@
     });
     body.appendChild(el('div',{'class':'form-foot'},[
       el('button',{type:'button','class':'btn btn-danger',text:'이 '+sec.label+' 삭제',on:{click:function(){removeItem(name,idx);}}}),
-      el('button',{type:'button','class':'btn',text:'완료',on:{click:function(){editing=-1;renderPanel();}}})
+      el('button',{type:'button','class':'btn',text:'완료',on:{click:back}})
     ]));
   }
   // 사진 맞춤: 카드·배너 칸 크기는 고정, 사진을 어떻게 넣을지만 고른다
@@ -755,6 +788,7 @@
     return wrap;
   }
   function goArticle(id){
+    if(tab!=='articles')articleBack={tab:tab,editing:editing};
     var k=(data.articles||[]).map(function(a){return a.id;}).indexOf(id);
     if(k>=0)openItem('articles',k);
   }
@@ -831,7 +865,7 @@
     if(names.indexOf('articles')>=0){
       for(var ai=0;ai<data.articles.length;ai++){
         if(/data:image\/svg\+xml/.test(data.articles[ai].html||'')){
-          openItem('articles',ai);
+          goArticle(data.articles[ai].id);
           toast('「'+articleTitle(data.articles[ai])+'」에 아직 바꾸지 않은 빈 사진 칸이 있어요. 사진을 누르고 「사진 바꾸기」 하거나 지운 뒤 저장해 주세요.','err');
           return;
         }
