@@ -3,7 +3,7 @@
     {
       "id": "yun",
       "name": "윤재남",
-      "role": "고3 영어 대표강사",
+      "role": "중·고등 영어 전문 강사",
       "subject": "정시 · 수능",
       "photo": "/images/teacher-yunjaenam.png",
       "badge": "대표강사",
@@ -35,7 +35,7 @@
     {
       "id": "yu",
       "name": "유수미",
-      "role": "중·고등 영어 전문강사",
+      "role": "중·고등 영어 전문 강사",
       "subject": "내신 · 수행",
       "photo": "/images/teacher-yusumi.png",
       "badge": "내신·수행",
@@ -63,7 +63,7 @@
     {
       "id": "park",
       "name": "박지유",
-      "role": "중·고등 영어 전문강사",
+      "role": "중·고등 영어 전문 강사",
       "subject": "논리 독해 · 내신",
       "photo": "/images/teacher-parkjiyu.png",
       "badge": "논리 독해",
@@ -91,7 +91,7 @@
     {
       "id": "kim",
       "name": "김상학",
-      "role": "중·고등 영어 전문강사",
+      "role": "중·고등 영어 전문 강사",
       "subject": "입시 영어 · 독해",
       "photo": "/images/teacher-kimsanghak.png",
       "badge": "입시 러닝메이트",
