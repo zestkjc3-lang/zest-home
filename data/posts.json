@@ -1,25 +1,18 @@
 {
   "items": [
     {
-      "category": "공지",
-      "title": "학교별 개설반 안내",
-      "image": "/images/blog1.png",
-      "alt": "학교별 개설반 안내",
-      "link": "post.html?id=ban-guide"
-    },
-    {
       "category": "학습정보",
-      "title": "내신 대비 이렇게 준비하세요",
-      "image": "/images/blog2.png",
-      "alt": "상위권 맞춤 내신 대비 — 제스트에듀 수미T",
-      "link": "post.html?id=naesin"
+      "title": "중흥고 영어에 진심! 수미T의 7가지 원칙",
+      "image": "/images/blog6-jungheung.jpg",
+      "alt": "중흥고 영어에 진심! 중하위권 학생을 상위권으로, 상위권 학생은 최상위권으로! — 수미T 7가지 원칙: 누구도 소외되지 않게, 단어는 고반복, 지문은 최소 3회독, 문제풀이는 오답이 생명, 수준에 맞는 학습, 안 되면 될 때까지, 가장 중요한 것은 학생의 긍정적인 변화. 제스트에듀 수미T",
+      "link": "post.html?id=jungheung"
     },
     {
       "category": "성적 발표",
-      "title": "상일고1 전교 1·3등 배출!",
-      "image": "/images/grades-sangil-cover.png",
-      "alt": "상일고1 1학기 전교 1·3등 배출 — 제스트에듀",
-      "link": "post.html?id=classroom"
+      "title": "중원고1 영어 99점 4명 · 21점 상승",
+      "image": "/images/jungwon-midterm-result.jpg",
+      "alt": "2026학년도 2학기 중간고사 중원고 1학년 영어 — 99점 4명, 90점 이상 9명, 21점 상승, 제스트에듀 지유T",
+      "link": "post.html?id=jungwon-midterm"
     },
     {
       "category": "성적 발표",
@@ -31,17 +24,24 @@
     },
     {
       "category": "성적 발표",
-      "title": "중원고1 영어 99점 4명 · 21점 상승",
-      "image": "/images/jungwon-midterm-result.jpg",
-      "alt": "2026학년도 2학기 중간고사 중원고 1학년 영어 — 99점 4명, 90점 이상 9명, 21점 상승, 제스트에듀 지유T",
-      "link": "post.html?id=jungwon-midterm"
+      "title": "상일고1 전교 1·3등 배출!",
+      "image": "/images/grades-sangil-cover.png",
+      "alt": "상일고1 1학기 전교 1·3등 배출 — 제스트에듀",
+      "link": "post.html?id=classroom"
     },
     {
       "category": "학습정보",
-      "title": "중흥고 영어에 진심! 수미T의 7가지 원칙",
-      "image": "/images/blog6-jungheung.jpg",
-      "alt": "중흥고 영어에 진심! 중하위권 학생을 상위권으로, 상위권 학생은 최상위권으로! — 수미T 7가지 원칙: 누구도 소외되지 않게, 단어는 고반복, 지문은 최소 3회독, 문제풀이는 오답이 생명, 수준에 맞는 학습, 안 되면 될 때까지, 가장 중요한 것은 학생의 긍정적인 변화. 제스트에듀 수미T",
-      "link": "post.html?id=jungheung"
+      "title": "내신 대비 이렇게 준비하세요",
+      "image": "/images/blog2.png",
+      "alt": "상위권 맞춤 내신 대비 — 제스트에듀 수미T",
+      "link": "post.html?id=naesin"
+    },
+    {
+      "category": "공지",
+      "title": "학교별 개설반 안내",
+      "image": "/images/blog1.png",
+      "alt": "학교별 개설반 안내",
+      "link": "post.html?id=ban-guide"
     }
   ]
 }

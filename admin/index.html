@@ -551,6 +551,8 @@
   function addItem(name){
     var sec=SECTIONS[name];
     if(sec.max&&data[name].length>=sec.max){toast(sec.label+'는 최대 '+sec.max+'개까지예요.','err');return;}
+    // 공지 카드는 최신 글이 맨 앞(왼쪽 위)에 오도록 앞에 넣는다
+    if(name==='posts'){data[name].unshift(sec.blank());changed(name);openItem(name,0);return;}
     data[name].push(sec.blank());changed(name);openItem(name,data[name].length-1);
   }
   function removeItem(name,k){
