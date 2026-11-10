@@ -33,6 +33,20 @@
       ]
     },
     {
+      "id": "jeong",
+      "name": "정찬",
+      "role": "중·고등 영어 전문 강사",
+      "subject": "",
+      "photo": "/images/teacher-placeholder.svg",
+      "badge": "예비고1 트레이닝",
+      "card": "",
+      "tag": "",
+      "points": [],
+      "edu": [],
+      "career": [],
+      "books": []
+    },
+    {
       "id": "yu",
       "name": "유수미",
       "role": "중·고등 영어 전문 강사",
@@ -112,6 +126,34 @@
         "前 (일산) 이지베스트학원 중/고등 강사",
         "前 (파주) 비상아이비츠학원 중/고등 강사"
       ],
+      "books": []
+    },
+    {
+      "id": "kimjh",
+      "name": "김진홍",
+      "role": "중·고등 영어 전문 강사",
+      "subject": "",
+      "photo": "/images/teacher-placeholder.svg",
+      "badge": "",
+      "card": "",
+      "tag": "",
+      "points": [],
+      "edu": [],
+      "career": [],
+      "books": []
+    },
+    {
+      "id": "kimej",
+      "name": "김은지",
+      "role": "중·고등 영어 전문 강사",
+      "subject": "",
+      "photo": "/images/teacher-placeholder.svg",
+      "badge": "",
+      "card": "",
+      "tag": "",
+      "points": [],
+      "edu": [],
+      "career": [],
       "books": []
     }
   ]
