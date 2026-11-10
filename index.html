@@ -794,7 +794,7 @@
       el.className='tcard';
       el.setAttribute('data-edit','teachers:'+k);
       el.innerHTML=
-        '<div class="stage"><span class="badge">'+esc(t.badge)+'</span>'+
+        '<div class="stage">'+(t.badge?'<span class="badge">'+esc(t.badge)+'</span>':'')+
         '<img src="'+esc(asset(t.photo))+'" alt="'+esc(t.name)+'" onerror="this.classList.add(\'broken\')"/>'+
         '<div class="ph-slot">📷<small>'+esc(t.name)+' 선생님 사진</small></div></div>'+
         '<div class="meta"><b>'+esc(t.name)+'<span class="t">T</span></b><span>'+esc(t.role)+'</span></div>'+

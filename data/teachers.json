@@ -6,7 +6,7 @@
       "role": "중·고등 영어 전문 강사",
       "subject": "정시 · 수능",
       "photo": "/images/teacher-yunjaenam.png",
-      "badge": "대표강사",
+      "badge": "정시전문",
       "card": "확실한 수능 1등급을 향한, 급이 다른 영어",
       "tag": "“확실한 수능 1등급을 향한, 급이 다른 윤재남 영어 — 정시영어 고민 끝!”",
       "points": [],
@@ -15,7 +15,7 @@
         "대원외고 졸업"
       ],
       "career": [
-        "現 제스트에듀 고3 영어 대표강사",
+        "現 제스트에듀 수능영어 전문강사",
         "現 모비딕영어연구소 소장",
         "現 EBS 교재 사전검토위원",
         "現 강남종로 재종반(대치) 강사",
@@ -31,6 +31,20 @@
         "7일 만에 끝내는 영단어/영숙어",
         "대치동 1등급 영문법"
       ]
+    },
+    {
+      "id": "jeong",
+      "name": "정찬",
+      "role": "중·고등 영어 전문 강사",
+      "subject": "",
+      "photo": "/images/teacher-placeholder.svg",
+      "badge": "예비고1 트레이닝",
+      "card": "",
+      "tag": "",
+      "points": [],
+      "edu": [],
+      "career": [],
+      "books": []
     },
     {
       "id": "yu",
@@ -112,6 +126,34 @@
         "前 (일산) 이지베스트학원 중/고등 강사",
         "前 (파주) 비상아이비츠학원 중/고등 강사"
       ],
+      "books": []
+    },
+    {
+      "id": "kimjh",
+      "name": "김진홍",
+      "role": "중·고등 영어 전문 강사",
+      "subject": "",
+      "photo": "/images/teacher-placeholder.svg",
+      "badge": "관리전문",
+      "card": "",
+      "tag": "",
+      "points": [],
+      "edu": [],
+      "career": [],
+      "books": []
+    },
+    {
+      "id": "kimej",
+      "name": "김은지",
+      "role": "중·고등 영어 전문 강사",
+      "subject": "",
+      "photo": "/images/teacher-placeholder.svg",
+      "badge": "클리닉 전문",
+      "card": "",
+      "tag": "",
+      "points": [],
+      "edu": [],
+      "career": [],
       "books": []
     }
   ]
