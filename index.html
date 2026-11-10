@@ -214,7 +214,7 @@
   /* 프로필 내용이 아직 없는 강사: 눌러도 열리지 않음 */
   .tcard-off{cursor:default}
   .tcard-off:hover .stage{transform:none;border-color:var(--line);box-shadow:none}
-  .tcard-off .more,.tcard-off:hover .more{color:var(--line-2)}
+  .tcard-off:hover .more{color:var(--muted-2)}
   .tcard-empty{pointer-events:none;cursor:default}
   .tcard-empty .stage{border-style:dashed;border-color:var(--line-2);background:transparent;box-shadow:none}
   .tcard-empty:hover .stage{transform:none;border-color:var(--line-2);box-shadow:none}
@@ -804,7 +804,7 @@
         '<img src="'+esc(asset(t.photo))+'" alt="'+esc(t.name)+'" onerror="this.classList.add(\'broken\')"/>'+
         '<div class="ph-slot">📷<small>'+esc(t.name)+' 선생님 사진</small></div></div>'+
         '<div class="meta"><b>'+esc(t.name)+'<span class="t">T</span></b><span>'+esc(t.role)+'</span></div>'+
-        '<div class="more">'+(ready?'프로필 보기 →':'프로필 준비 중')+'</div>';
+        '<div class="more">프로필 보기 →</div>';
       if(ready)el.addEventListener('click',function(){openTeacher(t.id);});
       else el.setAttribute('aria-disabled','true');
       box.appendChild(el);
