@@ -211,6 +211,10 @@
   .ph-slot{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted-2);text-align:center;padding:14px}
   .ph-slot small{font-size:12px;font-weight:700}
   .tcard .stage img[src]:not([src=""]):not(.broken) ~ .ph-slot{display:none}
+  /* 프로필 내용이 아직 없는 강사: 눌러도 열리지 않음 */
+  .tcard-off{cursor:default}
+  .tcard-off:hover .stage{transform:none;border-color:var(--line);box-shadow:none}
+  .tcard-off .more,.tcard-off:hover .more{color:var(--line-2)}
   .tcard-empty{pointer-events:none;cursor:default}
   .tcard-empty .stage{border-style:dashed;border-color:var(--line-2);background:transparent;box-shadow:none}
   .tcard-empty:hover .stage{transform:none;border-color:var(--line-2);box-shadow:none}
@@ -791,15 +795,18 @@
     box.innerHTML='';
     TEACHERS.forEach(function(t,k){
       var el=document.createElement('div');
-      el.className='tcard';
+      // 강의 특징·학력·약력·저서·첫 문구가 모두 비어 있으면 프로필 보기를 막는다 (/admin 에서 채우면 자동으로 열림)
+      var ready=[t.points,t.edu,t.career,t.books].some(function(a){return a&&a.length;})||!!t.tag;
+      el.className='tcard'+(ready?'':' tcard-off');
       el.setAttribute('data-edit','teachers:'+k);
       el.innerHTML=
         '<div class="stage">'+(t.badge?'<span class="badge">'+esc(t.badge)+'</span>':'')+
         '<img src="'+esc(asset(t.photo))+'" alt="'+esc(t.name)+'" onerror="this.classList.add(\'broken\')"/>'+
         '<div class="ph-slot">📷<small>'+esc(t.name)+' 선생님 사진</small></div></div>'+
         '<div class="meta"><b>'+esc(t.name)+'<span class="t">T</span></b><span>'+esc(t.role)+'</span></div>'+
-        '<div class="more">프로필 보기 →</div>';
-      el.addEventListener('click',function(){openTeacher(t.id);});
+        '<div class="more">'+(ready?'프로필 보기 →':'프로필 준비 중')+'</div>';
+      if(ready)el.addEventListener('click',function(){openTeacher(t.id);});
+      else el.setAttribute('aria-disabled','true');
       box.appendChild(el);
     });
     // 모바일 2열에서 마지막이 홀수면 오른쪽 빈 자리(다음 강사 예정)
